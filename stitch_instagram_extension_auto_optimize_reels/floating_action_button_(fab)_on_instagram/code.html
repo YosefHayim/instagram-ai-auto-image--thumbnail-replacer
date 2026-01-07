@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Instagram Grid Enhancer - FAB Design</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#a855f7", // Purple-500 equivalent base
+                "background-light": "#fafafa", // Instagram light bg is often very subtly gray or white
+                "background-dark": "#000000", // Instagram dark bg
+                "surface-light": "#ffffff",
+                "surface-dark": "#121212", // Dark mode card/surface
+              },
+              fontFamily: {
+                "display": ["Spline Sans", "sans-serif"],
+                "body": ["Spline Sans", "sans-serif"]
+              },
+              borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style>
+        /* Custom utilities for the specific FAB requirements that go beyond simple utilities */
+        .fab-gradient {
+            background: linear-gradient(135deg, #a855f7 0%, #d946ef 100%);
+        }
+        .fab-shadow {
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.5), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .fab-pulse-ring {
+            animation: pulse-ring 3s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(168, 85, 247, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display min-h-screen flex flex-col overflow-x-hidden">
+<!-- Navbar Mockup -->
+<nav class="sticky top-0 z-40 w-full border-b border-gray-200 dark:border-gray-800 bg-surface-light dark:bg-background-dark px-4 h-16 flex items-center justify-center">
+<div class="max-w-[975px] w-full flex items-center justify-between">
+<!-- Logo area -->
+<div class="text-xl font-bold tracking-tight">Instagram</div>
+<!-- Search Bar (Hidden on small screens) -->
+<div class="hidden sm:block bg-gray-100 dark:bg-gray-800 px-4 py-1.5 rounded-lg w-64">
+<div class="flex items-center text-gray-400 text-sm">
+<span class="material-symbols-outlined text-[18px] mr-2">search</span>
+<span>Search</span>
+</div>
+</div>
+<!-- Nav Icons -->
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-[26px]">home</span>
+<span class="material-symbols-outlined text-[26px]">chat_bubble_outline</span>
+<span class="material-symbols-outlined text-[26px]">favorite_border</span>
+<div class="h-6 w-6 rounded-full bg-gray-300 dark:bg-gray-700 overflow-hidden">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="Small user profile avatar in navigation bar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYURQwwDfmoW7--PN1QUd5p3GmAJ_hq_HAiOwmOpT_G0dsz97XknGkm0e2w9th4TuqS422a2O3CwtBT2UpVGjyAh7FeQFchTCx3GspS-KSJA5KYrHcmHwpVvD9LkIxRHMKfIP6MaNrJB8595KvjQ5e7MdS3cNA1cOt2sK4c5UssSDEwPHh3PAV9nwhyBhEy65RCe32N7kH3og87_g8csA8XuI9Gmy9czcEZnCdISEhPYYvmO962l6fvfp9mjBtRmxCt9qsqlzozm4q"/>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-grow w-full flex justify-center bg-background-light dark:bg-background-dark">
+<div class="max-w-[935px] w-full px-5 py-8">
+<!-- Profile Header -->
+<header class="flex flex-col sm:flex-row items-center sm:items-start gap-8 mb-12 px-4 sm:px-12">
+<!-- Avatar -->
+<div class="flex-shrink-0">
+<div class="w-20 h-20 sm:w-36 sm:h-36 rounded-full p-[2px] bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500">
+<div class="w-full h-full rounded-full border-2 border-background-light dark:border-background-dark overflow-hidden bg-gray-200">
+<img alt="Profile Picture" class="w-full h-full object-cover" data-alt="Large profile picture of a young man smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZUT0nQetUIh9d7JVIz5wnHw166rjqW-RhSP529uohrBcPXixBW_Aotq0HyWjkWjWlB3e7URBVVWJHrM8MnSUwVrypXVHNGM6QHNQ4RmBS9QTjjPfo4X4Q5Q8qyCLYKE2V-W6PJRbycq8BYb2t7eZpWpXS799YTCOBjbtz0eWE8NkWEASNdRf83xxLZZb4WT-hcLAbJNH8fyCffkcSTSmIRdgSFZb81UxRJP5KMSrlAX4y4QYBBI8azTGVSOAfl42p34GSXmJmczsW"/>
+</div>
+</div>
+</div>
+<!-- Profile Info -->
+<div class="flex flex-col gap-4 w-full">
+<div class="flex flex-col sm:flex-row items-center gap-4">
+<h2 class="text-xl font-normal">creative_user_123</h2>
+<div class="flex gap-2">
+<button class="px-4 py-1.5 bg-gray-200 dark:bg-gray-800 rounded font-semibold text-sm hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors">Edit profile</button>
+<button class="px-4 py-1.5 bg-gray-200 dark:bg-gray-800 rounded font-semibold text-sm hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors">View archive</button>
+</div>
+<span class="material-symbols-outlined ml-auto sm:ml-2 cursor-pointer">settings</span>
+</div>
+<div class="flex justify-center sm:justify-start gap-8 sm:gap-10 text-base">
+<span><span class="font-bold">128</span> posts</span>
+<span><span class="font-bold">4.2k</span> followers</span>
+<span><span class="font-bold">890</span> following</span>
+</div>
+<div class="hidden sm:block">
+<div class="font-bold">Creative Studio</div>
+<div class="text-gray-600 dark:text-gray-400">Digital Creator</div>
+<div>Creating visual stories through lens &amp; code. 📸 💻</div>
+<a class="text-blue-900 dark:text-blue-200 font-semibold text-sm" href="#">www.creativestudio.com</a>
+</div>
+</div>
+</header>
+<!-- Stories Highlights -->
+<div class="flex gap-8 overflow-x-auto pb-4 mb-10 px-4 scrollbar-hide">
+<div class="flex flex-col items-center gap-2 cursor-pointer">
+<div class="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 p-1">
+<div class="w-full h-full rounded-full bg-slate-300 dark:bg-slate-700 overflow-hidden">
+<img alt="Travel highlight" class="w-full h-full object-cover" data-alt="Abstract camera icon for highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuADSf6gu3A0q_tFkQeWVkMLs9baXOYO_fHT_q-rNxUUdZQfw2trSdEI06aGxsSmguYnsUm4GebT5zRIDS_7umXMPSNMOjfHa2odKyyPMxNT9W3K39DSNdgfbrBhRAJMyAHvKROliV8nQNCqKN-Izkoh3ybzQpbx83UlnQCRCeqZgEC6PMkJC0V-awbrd-HqgramizV005VmGYdMGusy0LxmzW5iKi03Dykvm0IXUwksLjCMg7P0Oq4QSnlNKQw81GNcMG3OWdoUBhS_"/>
+</div>
+</div>
+<span class="text-xs font-semibold">Travel</span>
+</div>
+<div class="flex flex-col items-center gap-2 cursor-pointer">
+<div class="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 p-1">
+<div class="w-full h-full rounded-full bg-slate-300 dark:bg-slate-700 overflow-hidden">
+<img alt="Work highlight" class="w-full h-full object-cover" data-alt="Computer screen code for work highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWsAET126L6Hts3yMYYDk5akQx4yuIdWd3cguukHJeFhyrBwor7WZsos9g1VmreHWvgilGMPlDFMg9ZxU06cWiVaRVCwho6NkPSYR_xu_sDIp8hPbYYstMhsaOTOl8_1z3D0ym9pjXfBNHOotlNKyuCDGQvKHDWsev1_494H5KY4zuQK5GYkcP3NiwIs5zhY9BF2x7HCDUdTpuTy2r1tAKjB3ngiQuqo9DOh4KONvEgSTNOWbg_Y74E9AojWkxvRIx72ZevAv-vGOx"/>
+</div>
+</div>
+<span class="text-xs font-semibold">Work</span>
+</div>
+</div>
+<!-- Tab Nav -->
+<div class="border-t border-gray-200 dark:border-gray-800 flex justify-center gap-12 text-xs font-semibold tracking-widest text-gray-400 uppercase mb-4">
+<div class="border-t-2 border-black dark:border-white text-black dark:text-white py-4 flex items-center gap-2 cursor-pointer">
+<span class="material-symbols-outlined text-[16px]">grid_on</span> Posts
+                </div>
+<div class="py-4 flex items-center gap-2 cursor-pointer hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+<span class="material-symbols-outlined text-[16px]">bookmark_border</span> Saved
+                </div>
+<div class="py-4 flex items-center gap-2 cursor-pointer hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+<span class="material-symbols-outlined text-[16px]">account_box</span> Tagged
+                </div>
+</div>
+<!-- Image Grid -->
+<div class="grid grid-cols-3 gap-1 sm:gap-7 mb-24">
+<!-- Grid Item 1 -->
+<div class="relative aspect-square group cursor-pointer overflow-hidden bg-gray-100 dark:bg-gray-800">
+<img alt="Minimalist coffee cup on table" class="w-full h-full object-cover group-hover:brightness-75 transition-all duration-300" data-alt="Top down view of coffee on a minimal desk" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3JdaKyqIW568juGgeHosHr29Ojl5qX4X1j6sxn62GnRnaBuMIUth8oSLc9sjWL0XMhC5JFGuKYq5aIdAB7nur9BvWUiZWQxrh4JetkJJc25fFoF4C7LF-evNcYnb91rp_Wbkm27rDmnbWZoiIqBwlLpgrTtQ_QeZQ6u-3ScsF9o9CziOkx_lPwnCLrg_Jg4s7PqhpUqZxubf9LV24Glmx7PCA7_ltcTQ39qnK6lCNn4YfGjQFpd-3k3QlkeZyjBJ2ZeybqRC7q__5"/>
+<div class="absolute inset-0 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 text-white font-bold transition-opacity z-10">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined fill-current">favorite</span> 1.2k</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined fill-current">mode_comment</span> 45</span>
+</div>
+</div>
+<!-- Grid Item 2 -->
+<div class="relative aspect-square group cursor-pointer overflow-hidden bg-gray-100 dark:bg-gray-800">
+<img alt="Group of friends laughing at sunset" class="w-full h-full object-cover group-hover:brightness-75 transition-all duration-300" data-alt="Silhouettes of friends jumping during sunset" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDH-jQdfBBuUoJZoarQUwSxpoidFlLTA2eZLUyJaY9nb0A7ZAA3UiUi0nSjYdgBvZlhUF-zyv3F8WZPqCSmL-EA6nZ_HDeqpHh63PEKNd-UA7bBsDntdM4XtN5LpP2B-vWEqtd97mCfrwlgtNVu1xBDYbNVA4ST3LRkMdwKMaj7enejWAObs4uQWSI2p0v-2804vUKsQHuoxA2RwwTJNOWoaXXBqPCRk6w1WLYsDHi3R5ufQxmWy37FyrRhZZ34EYdaisWrAarlEge"/>
+</div>
+<!-- Grid Item 3 -->
+<div class="relative aspect-square group cursor-pointer overflow-hidden bg-gray-100 dark:bg-gray-800">
+<img alt="Snowy mountain landscape" class="w-full h-full object-cover group-hover:brightness-75 transition-all duration-300" data-alt="Scenic mountain range covered in snow" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDY86RR4yk9e49j4X6-Kub2Czqhn_2ThbBfIvu1p6uKop5UxobIqruUb0nQEJvCg7w0MxiS_UGlVxbkKzKRXfYbBKch_0SeDzmIgAyME9K7W-LZ0yecQ7Tz7i7vZXs3bKTYxpfCKpinbUKkSjNrm-KhBbFJEvEdBVXRSBHG5U8Wton2nfba8w8hN0bUyMjGjtgO1ZGtbZKYjNioZo3IqmnyHokCly-FTTTe4TvXOKZWnkACH024eo0iH5XGcgZ6d6IWkEwpyZ-XZa_b"/>
+</div>
+<!-- Grid Item 4 -->
+<div class="relative aspect-square group cursor-pointer overflow-hidden bg-gray-100 dark:bg-gray-800">
+<img alt="Workspace with laptop and plants" class="w-full h-full object-cover group-hover:brightness-75 transition-all duration-300" data-alt="Clean workspace with laptop and green plant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCReIfGS-xwqKMXwh2-TZVr5NXIBOjturITHMLARPpOEfY-teWs7NtyCAEJOM96sYKXt84HYqZIAGVxvx6Sm2se-nza-dX3mTgszFmCQd9cDHG00KHVR7GcKpEfMZ8HK7l9fqTTeiOOO5E1gNG1bH3r8sZlcTJfkpALgOvpa3df52-Gmqe3khF_x95yn0iIWCy9m5HoEJW7zNva0sckabtBP6l3IDcNsDXFHpGw37BJeWLdqnyScG6eWmXmq4ZIZ9IfFsPRD-If8aiX"/>
+</div>
+<!-- Grid Item 5 -->
+<div class="relative aspect-square group cursor-pointer overflow-hidden bg-gray-100 dark:bg-gray-800">
+<img alt="Portrait of a woman" class="w-full h-full object-cover group-hover:brightness-75 transition-all duration-300" data-alt="Portrait of a young woman looking confident" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlr6D4QiuwGTVYTqs4QNBwNYW9GslJIgt_8HSgRrK6giXp7ilLaknHFtMTtBxjk1NqISOFUH7phcUy8DMpto-xvz78JsDKqwExVwBNweDnTEAoUDdhrNTL6yg4hCI-5O210mPlQLwEM2dH-X2o_S3a_nGtzfJLLHMme49SUPMRCjzvmKumGlqWKkmKmsJluCV-3LIeyoyr-ragkb_uId0V0JjT_uwYM7fQRdVVbv82YV-w3tHrjPqgqUzGmLCMp0HXQSVc8ev2ZgH6"/>
+</div>
+<!-- Grid Item 6 -->
+<div class="relative aspect-square group cursor-pointer overflow-hidden bg-gray-100 dark:bg-gray-800">
+<img alt="Fashion model posing" class="w-full h-full object-cover group-hover:brightness-75 transition-all duration-300" data-alt="Fashion shot of a model in urban setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVwl1xOAy9pmvcVtrM-jeOYiRtoP-uP70BPeUC_Z0ZgCTWCdYx4god69nGnRpnlW9pbBkSWPNtQUSL0siUvxWTRSUmY1iWrxiA58CMEOJGWKQWimDBKMXdXa1NcECwL5Nqikh4vfQ7r3iyg1rlGjE0wjnSDuCaQcVbb1OAu9vcWhIUm4lLaC5OVGW3DzXGbZJ13BpOb0YgkBXZj0ARt_McIeZhwfugWr3t56LuBnCroE8lIwifgag0RnhpJXfcQEYfPEhJT9b0WXjC"/>
+</div>
+<!-- Grid Item 7 -->
+<div class="relative aspect-square group cursor-pointer overflow-hidden bg-gray-100 dark:bg-gray-800">
+<img alt="River running through a canyon" class="w-full h-full object-cover group-hover:brightness-75 transition-all duration-300" data-alt="Large river winding through a rocky canyon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSo1VhdNALFrsRpaXUz63p0MDxnpBT6HoKbxiN8PFMuKBttP8gRPdQosNysD4lbxzl9XBBsvUoosgExbA6nGYCTCpiAXhC7o6uTJiQMGj-TnX8nR8OpJn-BGgKMNVK4kycu673saDkqwBum10xixvV2xpCngHcpp9jKo5ASX79joOfDao_NErlTbNRrsdbrvNQZSS2POZ1bklZPVFEVxBuInBDRK07mBJMgGLme_zLdzsuoT6kIFGgnLFtuiIO3MqoJSQfHsooRq97"/>
+</div>
+<!-- Grid Item 8 -->
+<div class="relative aspect-square group cursor-pointer overflow-hidden bg-gray-100 dark:bg-gray-800">
+<img alt="Travel photography of a coast" class="w-full h-full object-cover group-hover:brightness-75 transition-all duration-300" data-alt="Beautiful coastline with turquoise water" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2XiXAB3QTpGkCrrJHwPjJX7FkxVd8N2U1uGq5K4BS8LL0Y3A3zy01fokC2oSAmS5hHtYQqOWQzBqQcM2-0r9rqScuwvwZ22SG-2xp9T_azsl_M6lOKUvX3AqfXir_o6c4YOO1NK4lNP1NLIx2mPGLdpn7illXotihbsYiKf9rfSAZuQ0KZ2TWtUYLYwp9sWxgZAUEgO7xErJjlgJGEIi3fOyAlwQqCxnSyD3RP8-aSozacRdRpRM46mNS2t6p-z17NwwwOuECAu55"/>
+</div>
+<!-- Grid Item 9 -->
+<div class="relative aspect-square group cursor-pointer overflow-hidden bg-gray-100 dark:bg-gray-800">
+<img alt="Nature landscape at dawn" class="w-full h-full object-cover group-hover:brightness-75 transition-all duration-300" data-alt="Sun rising over a misty green valley" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCYgDwLkAdkVqOj1-0i-jFhCrEhEgYIw_xxMAtV0hYLxLhvMSHVMpaEeg3I8zIGpyi1_p4n8wfp9WzHrVSMZ-24n64nMEZHWoyz0Kuds4D-joi3oap_j1ElVq0eJs7DJyfEzPrwVZDpWGs8qQ_2zbY0NxSoX2VMQ9HCrn2y4L63mD58vmklG7ySvUC-8efpL0ND7tU4q30ehbuZKL-y3qRWkcXepj4GIVYXrq-kUACTNaVJAEcQI8-HTWfuIx5Wf3QrT3jKuT_q3Wf"/>
+</div>
+</div>
+<!-- Footer Mockup -->
+<footer class="text-xs text-gray-400 text-center pb-20">
+<p>© 2023 INSTAGRAM FROM META</p>
+</footer>
+</div>
+</main>
+<!-- FAB COMPONENT START -->
+<div class="fixed z-[9999] bottom-6 right-6 group/fab flex flex-col items-end gap-2">
+<!-- Tooltip Label -->
+<div class="absolute right-[70px] top-1/2 -translate-y-1/2 pointer-events-none transition-all duration-300 opacity-0 -translate-x-2 group-hover/fab:translate-x-0 group-hover/fab:opacity-100">
+<div class="bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-3 py-1.5 rounded-lg text-sm font-semibold whitespace-nowrap shadow-lg">
+                Enhance Grid
+            </div>
+</div>
+<!-- Button Container -->
+<div class="relative flex items-center justify-center">
+<!-- Pulse Ring Animation Layer -->
+<!-- Note: Using inline style for animation to strictly follow 'no css file' request but ensure specific visual physics -->
+<div class="fab-pulse-ring absolute inset-0 rounded-full bg-primary/40"></div>
+<!-- Main FAB Button -->
+<!-- 
+                Properties:
+                - 56x56px (w-14 h-14)
+                - Circular (rounded-full)
+                - Gradient bg (fab-gradient class defined in style)
+                - Glowing Shadow (fab-shadow class)
+                - Hover Scale 1.05
+            -->
+<button class="fab-gradient fab-shadow relative z-10 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full text-white transition-all duration-300 ease-out hover:scale-105 hover:brightness-110 active:scale-95 focus:outline-none focus:ring-4 focus:ring-purple-300/50">
+<!-- Sparkles Icon -->
+<span class="material-symbols-outlined text-[28px] animate-pulse" style="font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;">
+                    auto_awesome
+                </span>
+</button>
+</div>
+</div>
+<!-- FAB COMPONENT END -->
+</body></html>

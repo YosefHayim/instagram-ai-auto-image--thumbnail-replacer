@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Optimizer Side Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#a855f7",
+                        "background-light": "#f7f5f8",
+                        "background-dark": "#191022",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen relative font-display overflow-hidden">
+<!-- Simulated Instagram Background Content (Blurred for focus) -->
+<div class="absolute inset-0 z-0 p-8 grid grid-cols-3 gap-4 opacity-30 pointer-events-none select-none overflow-hidden">
+<!-- Header Placeholder -->
+<div class="col-span-3 flex gap-8 items-center mb-8 px-12">
+<div class="size-32 rounded-full bg-gray-300 dark:bg-gray-700"></div>
+<div class="flex flex-col gap-4 w-full">
+<div class="h-8 w-48 bg-gray-300 dark:bg-gray-700 rounded-lg"></div>
+<div class="h-4 w-96 bg-gray-200 dark:bg-gray-800 rounded-lg"></div>
+</div>
+</div>
+<!-- Grid Items -->
+<div class="aspect-square bg-gray-200 dark:bg-gray-800 rounded-sm"></div>
+<div class="aspect-square bg-gray-300 dark:bg-gray-700 rounded-sm"></div>
+<div class="aspect-square bg-gray-200 dark:bg-gray-800 rounded-sm"></div>
+<div class="aspect-square bg-gray-300 dark:bg-gray-700 rounded-sm"></div>
+<div class="aspect-square bg-gray-200 dark:bg-gray-800 rounded-sm"></div>
+<div class="aspect-square bg-gray-300 dark:bg-gray-700 rounded-sm"></div>
+</div>
+<!-- AI Optimizer Side Panel -->
+<div class="fixed bottom-0 right-4 z-50 flex flex-col items-end pb-4 w-[340px]">
+<!-- Panel Container -->
+<div class="w-full bg-white dark:bg-[#1e1625] rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] overflow-hidden flex flex-col border border-gray-100 dark:border-gray-800 animate-fade-in-up">
+<!-- 1. Gradient Header -->
+<header class="bg-gradient-to-r from-primary to-fuchsia-500 px-5 py-4 flex items-center justify-between text-white relative overflow-hidden">
+<!-- Decorative subtle glow in header -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+<div class="flex items-center gap-2.5 relative z-10">
+<span class="material-symbols-outlined text-[22px]">auto_fix_high</span>
+<h2 class="text-[17px] font-bold tracking-tight leading-tight">AI Optimizer</h2>
+</div>
+<button class="relative z-10 flex size-8 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</header>
+<!-- Scrollable Body -->
+<div class="flex flex-col p-5 gap-5">
+<!-- 2. Status Badge (Using Chips style) -->
+<div class="flex flex-wrap">
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-background-light dark:bg-white/5 border border-gray-100 dark:border-gray-700 pl-3 pr-4 shadow-sm">
+<span class="material-symbols-outlined text-primary text-[18px]">bolt</span>
+<p class="text-slate-800 dark:text-slate-100 text-xs font-semibold leading-normal">
+                            Free Plan: <span class="text-primary">3 Credits</span>
+</p>
+</div>
+</div>
+<!-- 3. Actions Group -->
+<div class="flex flex-col gap-3">
+<!-- Primary Button: Try 1 Image -->
+<button class="group relative flex items-center w-full p-1.5 rounded-full bg-primary text-white shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all active:scale-[0.98]">
+<!-- "Free" Tag -->
+<div class="absolute -top-2 right-4 bg-yellow-400 text-yellow-950 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full shadow-sm z-10 tracking-wide border border-white dark:border-slate-800">Free</div>
+<div class="flex items-center justify-center size-10 bg-white/20 rounded-full text-white shrink-0 backdrop-blur-sm">
+<span class="material-symbols-outlined text-[20px]">filter_vintage</span>
+</div>
+<div class="flex flex-col items-start pl-3 text-white flex-1">
+<span class="font-bold text-[15px] leading-tight">Try 1 Image</span>
+<span class="text-[11px] opacity-90 font-medium">Enhance latest post</span>
+</div>
+<div class="mr-2 opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0 duration-200">
+<span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</div>
+</button>
+<!-- Secondary Button: Optimize Full Feed (ListItem style adapted) -->
+<button class="flex items-center justify-between w-full p-2 pr-3 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-white/5 hover:bg-gray-50 dark:hover:bg-white/10 transition-colors group">
+<div class="flex items-center gap-3">
+<div class="flex items-center justify-center rounded-full bg-background-light dark:bg-gray-700 shrink-0 size-10 text-gray-500 dark:text-gray-400 group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">grid_view</span>
+</div>
+<div class="flex flex-col items-start">
+<p class="text-slate-900 dark:text-white text-[14px] font-bold leading-none">Optimize Feed</p>
+<p class="text-slate-500 dark:text-slate-400 text-[11px] font-normal leading-normal mt-0.5">Requires Premium</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-gray-400 text-[18px]">lock</span>
+</button>
+</div>
+<div class="h-px w-full bg-gray-100 dark:bg-gray-800"></div>
+<!-- 4. Upgrade CTA (Card style adapted) -->
+<div class="relative overflow-hidden rounded-2xl bg-[#191022] p-0 group shadow-md border border-gray-100 dark:border-gray-800">
+<!-- Background Image with Overlay -->
+<div class="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-overlay group-hover:scale-105 transition-transform duration-700" data-alt="Abstract purple gradient waves" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCTLnoS9zioBA3_M5Hp1a6QB-3Q0c2k6ISsd6-gIfQyaZ_WD_B5fUEqT4tjYsxszz2qJsbYXpIrhleBJmh0z00tb1h5NaHYWwOicwPYTbHDdDrpd0mrSvFzK38AanxLQhw3tVZNRDSb1ugQByYgVuvgtgPkRftAilSBA2VFKAIn32RhwQnl0ZE7Z1z4BwvYZ19h6ShkiM35qJJpOcciGSf-zZjd9pWVGcBfo_3moGYBWV6D2OcGJK9-X6VrRyh4-QVtqDlcKzUUwkMz");'></div>
+<div class="absolute inset-0 bg-gradient-to-br from-primary/90 to-purple-900/90"></div>
+<div class="relative z-10 p-4 flex flex-col gap-3">
+<div class="flex items-start justify-between">
+<div class="size-8 rounded-lg bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-[18px]">diamond</span>
+</div>
+<span class="text-[10px] font-bold bg-white text-primary px-2 py-1 rounded-full uppercase tracking-wider">Upgrade</span>
+</div>
+<div>
+<p class="text-white text-lg font-bold leading-tight">Unlimited Access</p>
+<p class="text-white/80 text-xs font-medium mt-1">Unlock full feed optimization for $1.00</p>
+</div>
+<button class="mt-1 flex w-full cursor-pointer items-center justify-center rounded-full h-9 bg-white text-primary text-xs font-bold uppercase tracking-wide hover:bg-gray-50 transition-colors">
+                            Upgrade Now
+                        </button>
+</div>
+</div>
+</div>
+<!-- 5. Processing Indicator Footer -->
+<div class="bg-background-light dark:bg-[#251b2e] border-t border-gray-100 dark:border-gray-800 px-5 py-3 flex items-center gap-3">
+<div class="relative size-4 shrink-0">
+<div class="absolute inset-0 rounded-full border-2 border-gray-200 dark:border-gray-600"></div>
+<div class="absolute inset-0 rounded-full border-2 border-t-primary border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
+</div>
+<div class="flex flex-col overflow-hidden">
+<p class="text-[11px] font-semibold text-primary truncate animate-pulse">Analyzing composition...</p>
+</div>
+</div>
+</div>
+</div>
+</body></html>

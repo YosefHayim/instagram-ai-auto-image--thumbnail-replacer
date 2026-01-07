@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",
-    "package": "plasmo package"
+    "package": "plasmo package",
+    "backend:install": "cd backend && pip install -r requirements.txt",
+    "backend:dev": "cd backend && python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000",
+    "backend:start": "cd backend && python -m uvicorn main:app --host 0.0.0.0 --port 8000",
+    "start:all": "concurrently \"npm run dev\" \"npm run backend:dev\""
   },
   "dependencies": {
     "@plasmohq/storage": "^1.15.0",
@@ -50,12 +54,6 @@
       "storage",
       "activeTab",
       "tabs"
-    ],
-    "content_scripts": [
-      {
-        "matches": ["https://www.instagram.com/*", "https://instagram.com/*"],
-        "run_at": "document_idle"
-      }
     ]
   }
 }

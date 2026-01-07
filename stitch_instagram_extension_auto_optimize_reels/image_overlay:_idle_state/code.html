@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Instagram AI Optimizer - Idle State</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;family=Noto+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#a855f7",
+                        "background-light": "#f7f5f8",
+                        "background-dark": "#191022",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar to match clean UI */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: rgba(168, 85, 247, 0.2);
+            border-radius: 20px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(168, 85, 247, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex flex-col font-display text-slate-900 dark:text-white overflow-x-hidden antialiased transition-colors duration-300">
+<!-- Top Navigation Bar -->
+<div class="w-full border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-slate-900 sticky top-0 z-40 transition-colors duration-300">
+<div class="max-w-[975px] mx-auto px-5 h-[60px] flex items-center justify-between">
+<!-- Logo Area -->
+<div class="flex items-center gap-4 cursor-pointer">
+<h1 class="font-display font-bold text-xl tracking-tight">Instagram</h1>
+</div>
+<!-- Search Bar (Hidden on mobile, visible on tablet+) -->
+<div class="hidden md:flex bg-gray-100 dark:bg-slate-800 rounded-lg items-center px-4 py-2 w-[268px] transition-colors duration-300">
+<span class="material-symbols-outlined text-gray-400 dark:text-gray-500 text-[20px]">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full text-slate-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 font-normal" placeholder="Search" type="text"/>
+</div>
+<!-- Nav Icons -->
+<div class="flex items-center gap-6 text-slate-900 dark:text-white">
+<span class="material-symbols-outlined text-[26px] cursor-pointer hover:text-primary transition-colors">home</span>
+<span class="material-symbols-outlined text-[26px] cursor-pointer hover:text-primary transition-colors">chat_bubble</span>
+<span class="material-symbols-outlined text-[26px] cursor-pointer hover:text-primary transition-colors">add_box</span>
+<span class="material-symbols-outlined text-[26px] cursor-pointer hover:text-primary transition-colors">explore</span>
+<span class="material-symbols-outlined text-[26px] cursor-pointer hover:text-primary transition-colors">favorite</span>
+<!-- Profile Pic -->
+<div class="size-7 rounded-full bg-gray-200 bg-cover bg-center cursor-pointer ring-2 ring-transparent hover:ring-primary transition-all" data-alt="User profile picture thumbnail" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuACTqNTfRqPImd0golzEiVlhySO2M2f133JbJhs172zLF9LMzrO4vBVFEinpG4K3wpjYdCTBS8Zh5zaBKmyxd1DsG7_St44KPHkV5OdjvzixPGkkXAXg4uLa9Iq_1iKoUeqeBHTGfUl5ldoBeWBQsjwFa8QEJZkatMCaJkqZbP4CMhzWoaTP_iCbOgktUsxtFkGnBsIZjKzpftPGH0NoCYz_a7r9vslPCEzOK6Ur_X_dGus7J8hjYTpwnf3lPbyF4oniAIBj61dOuRK');">
+</div>
+</div>
+</div>
+</div>
+<!-- Main Content Area -->
+<main class="flex-grow w-full max-w-[975px] mx-auto px-5 py-8">
+<!-- Profile Header -->
+<header class="flex flex-col md:flex-row gap-8 md:gap-12 mb-12 items-center md:items-start">
+<!-- Avatar -->
+<div class="flex-shrink-0 relative group">
+<div class="size-36 md:size-40 rounded-full p-[2px] bg-gradient-to-tr from-yellow-400 to-primary">
+<div class="w-full h-full rounded-full border-2 border-white dark:border-background-dark overflow-hidden bg-white dark:bg-slate-800">
+<div class="w-full h-full bg-cover bg-center" data-alt="Large user profile picture" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAoOLKdEaHv9BNlDrHE9oU0u13SmFAfg9IcMmwo_eWHOX3GoSKv5-HnY76RG0RaeXIiH-Y-jb70P3yswsqTxBMC1d-DfbECJxMqRba190i2mvV6-u8t29p7wqj8vLiA4-HLExoX9JzgkNXxerBUzHhr7sHK6uuAy0ylJ8qR94StEVKlrCIreXUoVeLptsbY2YEBACip2-gvQEx6w3urzHXgj8dvmyO7KQ3Ygj0L8IlQNa-lRmzpal-jypOayXGj9tCthvgxlxubQa9F');">
+</div>
+</div>
+</div>
+</div>
+<!-- Profile Details -->
+<div class="flex-grow flex flex-col gap-5 w-full md:w-auto">
+<!-- Top Row: Username & Actions -->
+<div class="flex flex-col md:flex-row items-center gap-4">
+<h2 class="text-xl md:text-2xl font-normal truncate">creative_designer_ui</h2>
+<div class="flex gap-2 items-center">
+<button class="px-4 py-1.5 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-lg text-sm font-semibold transition-colors">
+                            Edit profile
+                        </button>
+<button class="px-4 py-1.5 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-lg text-sm font-semibold transition-colors">
+                            View archive
+                        </button>
+<!-- Injected Extension Trigger (Small) -->
+<button class="size-9 flex items-center justify-center bg-primary/10 hover:bg-primary/20 text-primary rounded-lg transition-colors" title="AI Optimizer Settings">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+</button>
+</div>
+<span class="material-symbols-outlined text-[24px] cursor-pointer ml-2 hidden md:block">settings</span>
+</div>
+<!-- Stats -->
+<div class="flex items-center justify-center md:justify-start gap-8 md:gap-10 text-base">
+<div class="flex gap-1"><span class="font-bold">128</span> posts</div>
+<div class="flex gap-1"><span class="font-bold">14.2k</span> followers</div>
+<div class="flex gap-1"><span class="font-bold">892</span> following</div>
+</div>
+<!-- Bio -->
+<div class="text-center md:text-left">
+<div class="font-bold">Sarah Jenkins</div>
+<div class="text-slate-600 dark:text-slate-300">
+                        Digital Artist &amp; UI Designer 🎨<br/>
+                        Creating clean, functional interfaces.<br/>
+                        Currently available for freelance work.
+                    </div>
+<a class="text-primary font-medium hover:underline" href="#">sarahjenkins.design</a>
+</div>
+</div>
+</header>
+<!-- Highlights (Optional Context) -->
+<div class="flex gap-4 md:gap-8 mb-10 overflow-x-auto pb-4 md:pb-0 scrollbar-hide justify-start md:justify-start px-2">
+<div class="flex flex-col items-center gap-2 cursor-pointer">
+<div class="size-20 rounded-full p-[2px] bg-gray-200 dark:bg-slate-700">
+<div class="w-full h-full rounded-full border-2 border-white dark:border-background-dark bg-gray-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden">
+<div class="w-full h-full bg-cover bg-center opacity-80" data-alt="Abstract gradient highlight cover" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuATmSOJLnu4grvMWYA24zNLdZeIuqOqsKd0VT1rolTiBRvD4OZ3xS29Yy9s6C2WnLAsYPqWg2Pw6McaTiKDdHfXjGLQeNWU2L1iacqF7xjOfyCodwL5WLupDvIIyuIIoP1WBDsr-eustg4U3zyBRL1flAW60jUt5jgyupLWbc7eFDnfhC69xwHxp0TOZBjKh5m6EycYm2kS1ehKRylE3DnvQLPh5bRl55tvtIfN-kfz1phUDKiBo7DT-NQVnGOuDdIQF6Sb5pcZjpTI');"></div>
+</div>
+</div>
+<span class="text-xs font-medium">Work</span>
+</div>
+<div class="flex flex-col items-center gap-2 cursor-pointer">
+<div class="size-20 rounded-full p-[2px] bg-gray-200 dark:bg-slate-700">
+<div class="w-full h-full rounded-full border-2 border-white dark:border-background-dark bg-gray-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden">
+<div class="w-full h-full bg-cover bg-center opacity-80" data-alt="Abstract gradient highlight cover" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAVy_QVZkKFiNX7Id0Xpl91KNAIHmWPtakaClRkxUfx6eB0TlgsM5WY3dHrQyd7djYyK3oQDIPfXkIBVoAOS_I0G-a1A2S6pOFABw1lUCDYsX6tPYJPT1VgNiMl4Fb1Kpp011aR2DEp6Nxghu2690glJiOwBBYElZsNRjJx6tXhQN4RBFIM11LKToz9ILNiNi7zyBfARnXObMUDyKGZzl58s2QdZcnVHnKFBPxpPrf29feGX5hQcnQpycTo1G5BHEhoG4SRb10TYT0E');"></div>
+</div>
+</div>
+<span class="text-xs font-medium">Travels</span>
+</div>
+<div class="flex flex-col items-center gap-2 cursor-pointer">
+<div class="size-20 rounded-full p-[2px] bg-gray-200 dark:bg-slate-700">
+<div class="w-full h-full rounded-full border-2 border-white dark:border-background-dark bg-gray-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden">
+<div class="w-full h-full bg-cover bg-center opacity-80" data-alt="Abstract gradient highlight cover" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD8b2S8T8zV_pKO3p1H-UacIFrzCpbbytaQjRxfOHRV1tXoU0etkCIlZdY9Pz7KX54LhP8QFn7_jCLj1I_5FeGWQ1FZuug4rkcLRXghlf9SO9WMJW3-qh4BFBi917LMcxUnoWebqtoeoRKJF9Cr70xaGRRFWOsz8Kkjk5qLUl0YQZNjwP42QIiI5vEgUrBiHrbaw20alnNdyTtodB54NFEhUusaFysbhOIaZIu5uHtZrohhPzLPja3OXGvM2HCHwtN4YcJkxwFupLdD');"></div>
+</div>
+</div>
+<span class="text-xs font-medium">Inspo</span>
+</div>
+</div>
+<!-- Grid Tabs -->
+<div class="border-t border-gray-200 dark:border-gray-800 flex justify-center gap-12 mb-4">
+<div class="flex items-center gap-2 border-t-2 border-slate-900 dark:border-white py-4 -mt-[1px] text-xs font-bold uppercase tracking-wider cursor-pointer">
+<span class="material-symbols-outlined text-[14px]">grid_on</span>
+                Posts
+            </div>
+<div class="flex items-center gap-2 border-t-2 border-transparent py-4 -mt-[1px] text-xs font-bold uppercase tracking-wider text-slate-400 cursor-pointer hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+<span class="material-symbols-outlined text-[14px]">bookmark</span>
+                Saved
+            </div>
+<div class="flex items-center gap-2 border-t-2 border-transparent py-4 -mt-[1px] text-xs font-bold uppercase tracking-wider text-slate-400 cursor-pointer hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+<span class="material-symbols-outlined text-[14px]">account_box</span>
+                Tagged
+            </div>
+</div>
+<!-- Image Grid -->
+<div class="grid grid-cols-3 gap-1 md:gap-7">
+<!-- Item 1 -->
+<div class="relative aspect-square group cursor-pointer overflow-hidden rounded md:rounded-lg">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="Modern minimal interior design living room" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCcx6QI1fzzAGzFZEQFZYm6qGZnYqHhUcwpmUUadOxKOyHdgQw4hmSiEkhFTElGSytbJM0A40eff3_j86SVapgh5RsczXoJPPNSaVb6Gtrodzr_JT4AymmjSMkDfsP-JVBjb_EgxrQAJnv6VYYPntJR27tg_EeDEE-Mnl4x-6os1EQwaMV50YbE8l8jpJjcf7DBVRky4QgkRzP0E-spqTuPAj_xqai5Aw1lB8-TCTfi7EJaSEffARPcnBBomaCEgBUx0EXKpIog1pX7');">
+</div>
+<!-- Native Hover Overlay -->
+<div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-6 text-white font-bold">
+<div class="flex items-center gap-1"><span class="material-symbols-outlined fill-current">favorite</span> 1.2k</div>
+<div class="flex items-center gap-1"><span class="material-symbols-outlined fill-current">mode_comment</span> 34</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="relative aspect-square group cursor-pointer overflow-hidden rounded md:rounded-lg">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="Close up of a ceramic vase with dried flowers" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBt_eaTWcMoc5fODsVPOaC9gtpG5HQPNI82H11cJuh_1_atYrDqkahjdNGTRow4y7aKs9aUkAgSGpTpXIrR6iALBPYsZ-9K7f4JPOJYH_kEOLLqp4ZnumeKrrjVkZY1RY8ep9oHvJWZP9nOC10KhypiwEL6AKVp7MNILCdAvhPNRYNd8AVGTsflNsWbsr-pSv3WXh2npp1dYTOOga0xM33uIhSDsgy4Cpk5L4ofk5-5nhpeDQCoccazGe2eZKDmZaqmqQZo9kZHQbnx');">
+</div>
+<div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-6 text-white font-bold">
+<div class="flex items-center gap-1"><span class="material-symbols-outlined fill-current">favorite</span> 856</div>
+<div class="flex items-center gap-1"><span class="material-symbols-outlined fill-current">mode_comment</span> 12</div>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="relative aspect-square group cursor-pointer overflow-hidden rounded md:rounded-lg">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="Laptop on desk with code on screen" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBksvr_Y57ie-GEhlPrTE8K9UHmAhIPodWjEbtYLFO2bYUMHP95MmPWOsSiFj8f3c0RvqDQei_UufIMUvFt5q-bcGXnZOlDJqY67G_3IoaVqDMlEhd5X9Lk9o_5US_oxs0qph14Z4FpUcuizUMjLVmz20ZFXTKYISD-RdjVmaqeG4i98JSKgUEt-H9Z4bwk_EZJiwDnph13yrJeN3FY5nk7G9f3SKg7ugV8z2gFSYSHHzu0uXVzhBtUWO8Q-PirNlEmhAFD9Q5f3zUA');">
+</div>
+<div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-6 text-white font-bold">
+<div class="flex items-center gap-1"><span class="material-symbols-outlined fill-current">favorite</span> 2.4k</div>
+<div class="flex items-center gap-1"><span class="material-symbols-outlined fill-current">mode_comment</span> 108</div>
+</div>
+</div>
+<!-- Item 4 -->
+<div class="relative aspect-square group cursor-pointer overflow-hidden rounded md:rounded-lg">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="Abstract colorful oil painting texture" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDPoqIQ9mDmDDpts5vhz_IVdyvzDZ2tlhcCUmDAgE0rZ97ndh1rPQP29wbNtjRUHfz989U4QgkR0Q75-eEA15Rtl99L0R6WYeZFFipbeQMmjj1LRlAs8qAOeAUZOlmbe6hN2Aoew9PjuZh3w5i6RBr5rLSzeZxTv6EurAi-SKH5NK-jsGZnQlynkomzfL5K5M3w1WL9B05K5K8atEIzJfcSxUhWSilA_hsUYQHr9y6ZhRTwal4yoi0lzp-L8VrCrgXsiQLy9Yb2iXKH');">
+</div>
+</div>
+<!-- Item 5 -->
+<div class="relative aspect-square group cursor-pointer overflow-hidden rounded md:rounded-lg">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="Green plant leaves texture pattern" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAkaALfLSgcXzWDDcRx7eFJURr5Jt79boHGLLfSZcCojnCn9NaM5re4Ne5R2bYrof37F9ZZn6s9OG2P9HHfm2e2gTgr5MINkJ4zt6xN7clhyg-QzkE2F7U94SgVfwQE3ShbyEajq7zt7zHasYAD9PcIDZ72T_isoCWXoviSPw0FbEyJHVAP4j5CO5yrn4hl7SZAP-2kkYCCa5vHClvdRa-Qu6Nj23H6BN8-oGixyWtT7sXAO-TfIpHe4VEkOEgSjffzEVnR8Dtg8ZEd');">
+</div>
+</div>
+<!-- Item 6 -->
+<div class="relative aspect-square group cursor-pointer overflow-hidden rounded md:rounded-lg">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="Modern architecture building facade" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAoFLxPqcyf6HMOj427roApXJYBnw6LHWhyNekbecWrQj4gZhtERMPqN7t40pdHhUl63_urUavPZIrIOcyy6uvTQM-CRb5G-oagnoWpvYbYXEKbInj5F620JU8Rf2XZPVOZZU-N5SK7trJxcs-94zV4qAtDah2W7QtDLqnYvibcgTnj82XS5V0QfnImPW6Yoy8vnm-6JPYAG5yGqq8gspg4rdWhhYOSZOD01cR9x7J_nFPzxBAtvcvxFgs-K6XFZL5TsJX_yBQaNUba');">
+</div>
+</div>
+<!-- Item 7 -->
+<div class="relative aspect-square group cursor-pointer overflow-hidden rounded md:rounded-lg">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="Coffee cup on a wooden table" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCppBmGXH1l5_YINghEPK37kQZ7vLegxmAyMP2-naOxmp4BV2ZkszNDAEATg5rUXCnpXKlNnuKSsd4sNAvryM_KA3K7OIDkOYbc7ZepFAaeqgBxIZ24WC-cK6E9esPS_ZPVwexGQ-lB8zwNcYOUlPltFvVBsAk34wQTJgNuIvnYLK4zcYK5Gh2R8Fm3YWlGq9lgoVZ7XLx2xXVCB5Z9otxsYTirf-5xvSidyKx6mzty8p2JBcq0ukjnwx1GBVeQYg4Z6zP_mw_Bhv35');">
+</div>
+</div>
+<!-- Item 8 -->
+<div class="relative aspect-square group cursor-pointer overflow-hidden rounded md:rounded-lg">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="Person holding a camera in a forest" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAh2BQ_A0vWR2x-KukBCCiCHUiLBbCgmMB5aFkd0eOc4R2ZVlXHHqARvYYPGzVC_jCbFMlx79tg7wM5CKL8QFUOuCLV6NMx8MfVDGQFxjGibA5_SoKi2tP3fxkpybUXhzEfpNN8VADqqgCDsuuz2emRqtQuXVatGlNRnuS0FctFn0rF-luXGRHmID5xX3OEqpAQnM83-k0ZoS04PcbZGmetwffDWDHp9rHC5P2PTL1k45dPCxMvWlSVL6YcrXMnp3Ae__uf6L1yx1Jx');">
+</div>
+</div>
+<!-- Item 9 -->
+<div class="relative aspect-square group cursor-pointer overflow-hidden rounded md:rounded-lg">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="Workspace desk setup with keyboard and mouse" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCEHqvADZJ45kT3tVYVaD1FTUiIZN1U77Wqakb1WIF2AGhQCyYK0y3u-KvRnHLdNyuKt3AZ6xgaign8nYWx4FYtzmRBx4W-ietg1FNpP9ddg5jF_BROx5I0SkYbpQASkCKoxJ3gdAF0F-n2xp86rGdpUx868_Qchc8gFy7F5qWQKXCBphJ5P_JzS0F_SeCmDwKCFz34C8e8Zm7IbzSJUHe5ZXlajeJFCiB5c_kWb0d2Aypa6PpkhKAlvGBN6gbeW721ZpN84MmwCAcJ');">
+</div>
+</div>
+</div>
+</main>
+<!-- Extension Floating Action Button (FAB) - Idle State Indicator -->
+<div class="fixed bottom-8 right-8 z-50 animate-bounce" style="animation-duration: 3s;">
+<div class="group relative">
+<!-- Tooltip -->
+<div class="absolute bottom-full right-0 mb-3 w-max hidden group-hover:block">
+<div class="bg-gray-900 text-white text-xs py-1 px-3 rounded-lg shadow-lg">
+                    AI Optimizer Ready
+                </div>
+</div>
+<!-- Button -->
+<button class="flex items-center gap-3 h-14 pl-5 pr-6 bg-primary hover:bg-purple-600 text-white rounded-full shadow-xl shadow-primary/30 transition-all duration-300 hover:scale-105">
+<span class="material-symbols-outlined text-[24px]">auto_fix_high</span>
+<span class="font-bold text-base tracking-wide">Optimize Grid</span>
+</button>
+</div>
+</div>
+<!-- Footer Area (Simple) -->
+<footer class="w-full py-6 text-center text-xs text-slate-400 dark:text-slate-600">
+<div class="flex justify-center gap-4 mb-2">
+<a class="hover:underline" href="#">Meta</a>
+<a class="hover:underline" href="#">About</a>
+<a class="hover:underline" href="#">Blog</a>
+<a class="hover:underline" href="#">Jobs</a>
+<a class="hover:underline" href="#">Help</a>
+<a class="hover:underline" href="#">API</a>
+</div>
+<p>© 2024 Instagram from Meta</p>
+</footer>
+</body></html>
