@@ -8,10 +8,19 @@ import {
   Grid,
   ArrowRight,
   Diamond,
+  Download,
+  Check,
 } from "lucide-react";
 import { cn, springConfig } from "~/lib/utils";
 import { StylePresetsGrid, type StylePreset } from "./StylePresetsGrid";
 import { CreatorInsights } from "./CreatorInsights";
+import { BeforeAfterSlider } from "./BeforeAfterSlider";
+
+interface EnhancedImagePreview {
+  originalUrl: string;
+  enhancedUrl: string;
+  postId: string;
+}
 
 interface SidePanelProps {
   isOpen: boolean;
@@ -30,6 +39,10 @@ interface SidePanelProps {
     hashtags: string[];
     engagementTip: string;
   };
+  enhancedPreview?: EnhancedImagePreview | null;
+  onApplyEnhancement?: () => void;
+  onDiscardEnhancement?: () => void;
+  onDownloadEnhancement?: () => void;
 }
 
 export function SidePanel({
@@ -44,6 +57,10 @@ export function SidePanel({
   onOptimizeFull,
   onUpgrade,
   creatorInsights,
+  enhancedPreview,
+  onApplyEnhancement,
+  onDiscardEnhancement,
+  onDownloadEnhancement,
 }: SidePanelProps) {
   const hasFreeCredits = credits > 0 || credits === -1;
   const isPremium = credits === -1;
@@ -134,6 +151,37 @@ export function SidePanel({
                   disabled={isProcessing}
                 />
               </motion.div>
+
+              {enhancedPreview && (
+                <motion.div
+                  className="flex flex-col gap-3"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.1 }}
+                >
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold text-slate-800">
+                      Enhanced Result
+                    </p>
+                    <motion.button
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary-50 text-primary-600 text-xs font-semibold hover:bg-primary-100 transition-colors"
+                      onClick={onDownloadEnhancement}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      Download
+                    </motion.button>
+                  </div>
+                  <BeforeAfterSlider
+                    beforeImage={enhancedPreview.originalUrl}
+                    afterImage={enhancedPreview.enhancedUrl}
+                    onApply={onApplyEnhancement}
+                    onDiscard={onDiscardEnhancement}
+                    showActions={true}
+                  />
+                </motion.div>
+              )}
 
               <motion.div
                 className="flex flex-col gap-3"

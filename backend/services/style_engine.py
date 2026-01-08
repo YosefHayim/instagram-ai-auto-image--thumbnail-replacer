@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from typing import Dict
 from PIL import Image
-from .image_processor import ImageProcessor
+from loguru import logger
+from services.image_processor import ImageProcessor
 
 
 @dataclass
@@ -86,6 +87,7 @@ class StyleEngine:
     def __init__(self):
         self.processor = ImageProcessor()
         self.presets = STYLE_PRESETS
+        logger.debug("StyleEngine initialized")
 
     def get_style_config(self, style_name: str) -> StyleConfig:
         return self.presets.get(style_name.lower(), STYLE_PRESETS["cinematic"])
@@ -93,6 +95,7 @@ class StyleEngine:
     def apply_style(
         self, image: Image.Image, style_name: str, intensity: float = 1.0
     ) -> Image.Image:
+        logger.info(f"Applying style: {style_name} with intensity {intensity}")
         config = self.get_style_config(style_name)
 
         def lerp(base: float, target: float, t: float) -> float:
@@ -128,6 +131,9 @@ class StyleEngine:
     async def enhance_from_url(
         self, image_url: str, style_name: str, intensity: float = 0.8
     ) -> Image.Image:
+        logger.info(f"Enhancing from URL: style={style_name}, intensity={intensity}")
         image = await self.processor.fetch_image(image_url)
         image = self.processor.resize_if_needed(image)
-        return self.apply_style(image, style_name, intensity)
+        result = self.apply_style(image, style_name, intensity)
+        logger.success(f"Enhancement complete: {result.size}")
+        return result

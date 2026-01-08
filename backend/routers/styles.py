@@ -1,12 +1,15 @@
 from typing import List
 from fastapi import APIRouter
+from loguru import logger
 
-from ..services import StyleEngine
-from ..services.style_engine import STYLE_PRESETS
+from services import StyleEngine
+from services.style_engine import STYLE_PRESETS
 
 router = APIRouter(prefix="/api/styles", tags=["styles"])
 
 style_engine = StyleEngine()
+
+logger.info("Styles router initialized")
 
 
 @router.get("")

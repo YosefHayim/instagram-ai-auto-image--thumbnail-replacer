@@ -4,18 +4,23 @@ from typing import Optional, Tuple
 import httpx
 from PIL import Image, ImageEnhance, ImageFilter
 import numpy as np
+from loguru import logger
 
 
 class ImageProcessor:
     def __init__(self):
         self.supported_formats = ["JPEG", "PNG", "WEBP"]
         self.max_size = (2048, 2048)
+        logger.debug("ImageProcessor initialized")
 
     async def fetch_image(self, url: str) -> Image.Image:
+        logger.debug(f"Fetching image from: {url[:80]}...")
         async with httpx.AsyncClient() as client:
             response = await client.get(url, follow_redirects=True)
             response.raise_for_status()
-            return Image.open(io.BytesIO(response.content))
+            image = Image.open(io.BytesIO(response.content))
+            logger.debug(f"Image fetched: {image.size}, mode={image.mode}")
+            return image
 
     def resize_if_needed(self, image: Image.Image) -> Image.Image:
         if image.width > self.max_size[0] or image.height > self.max_size[1]:

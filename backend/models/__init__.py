@@ -1,4 +1,4 @@
-from .schemas import (
+from models.schemas import (
     StylePreset,
     EnhanceRequest,
     EnhanceResponse,

@@ -1,7 +1,7 @@
-import type { PlasmoCSConfig, PlasmoGetStyle, PlasmoCSUIProps } from "plasmo";
+import type { PlasmoCSConfig, PlasmoGetStyle } from "plasmo";
 import { useState, useEffect, useCallback } from "react";
 import { createRoot } from "react-dom/client";
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import { LayoutGroup } from "framer-motion";
 import cssText from "data-text:~/style.css";
 
 import { FloatingActionButton } from "~/components/FloatingActionButton";
@@ -16,7 +16,7 @@ import {
   getInstagramFeedManager,
   type GridPost,
 } from "~/lib/instagram-feed-manager";
-import { springConfig } from "~/lib/utils";
+import { apiClient } from "~/lib/api-client";
 
 export const config: PlasmoCSConfig = {
   matches: ["https://www.instagram.com/*", "https://instagram.com/*"],
@@ -34,6 +34,12 @@ interface PostState {
   aiImage?: string;
 }
 
+interface EnhancedPreview {
+  originalUrl: string;
+  enhancedUrl: string;
+  postId: string;
+}
+
 const DEFAULT_CREATOR_INSIGHTS = {
   bestPostingTime: "Today, 18:30",
   suggestedCaption:
@@ -45,10 +51,10 @@ const DEFAULT_CREATOR_INSIGHTS = {
 
 const PROCESSING_MESSAGES = [
   "Analyzing composition...",
-  "Adjusting lighting...",
-  "Enhancing colors...",
-  "Optimizing contrast...",
-  "Generating aesthetic...",
+  "Applying AI enhancement...",
+  "Adjusting colors...",
+  "Optimizing for engagement...",
+  "Finalizing magic...",
 ];
 
 function InstagramAIOptimizer() {
@@ -68,6 +74,11 @@ function InstagramAIOptimizer() {
   const [mountedOverlays, setMountedOverlays] = useState<Set<string>>(
     new Set(),
   );
+  const [creatorInsights, setCreatorInsights] = useState(
+    DEFAULT_CREATOR_INSIGHTS,
+  );
+  const [enhancedPreview, setEnhancedPreview] =
+    useState<EnhancedPreview | null>(null);
 
   useEffect(() => {
     const manager = getInstagramFeedManager();
@@ -114,6 +125,29 @@ function InstagramAIOptimizer() {
       unsubscribe();
       manager.stop();
     };
+  }, [isOnProfile]);
+
+  useEffect(() => {
+    if (!isOnProfile) return;
+
+    const fetchInsights = async () => {
+      try {
+        const username = window.location.pathname.replace(/\//g, "");
+        if (username) {
+          const insights = await apiClient.getInsights(username);
+          setCreatorInsights({
+            bestPostingTime: insights.best_posting_time,
+            suggestedCaption: insights.suggested_caption,
+            hashtags: insights.hashtags,
+            engagementTip: insights.engagement_tip,
+          });
+        }
+      } catch (error) {
+        console.log("Using default insights - backend not available");
+      }
+    };
+
+    fetchInsights();
   }, [isOnProfile]);
 
   useEffect(() => {
@@ -169,7 +203,7 @@ function InstagramAIOptimizer() {
     const interval = setInterval(() => {
       messageIndex = (messageIndex + 1) % PROCESSING_MESSAGES.length;
       setProcessingMessage(PROCESSING_MESSAGES[messageIndex]);
-    }, 1500);
+    }, 2000);
 
     return () => clearInterval(interval);
   }, [isProcessing]);
@@ -186,51 +220,106 @@ function InstagramAIOptimizer() {
       return next;
     });
 
-    await simulateAIProcessing();
+    try {
+      const result = await apiClient.enhanceImage(
+        firstPost.imageUrl,
+        selectedStyle,
+        0.8,
+      );
 
-    const mockAiImage = generateMockAiImage(firstPost.imageUrl);
+      if (result.success) {
+        setPostStates((prev) => {
+          const next = new Map(prev);
+          next.set(firstPost.postId, {
+            state: "ready",
+            aiImage: result.enhanced_url,
+          });
+          return next;
+        });
 
-    setPostStates((prev) => {
-      const next = new Map(prev);
-      next.set(firstPost.postId, { state: "ready", aiImage: mockAiImage });
-      return next;
-    });
+        setEnhancedPreview({
+          originalUrl: firstPost.imageUrl,
+          enhancedUrl: result.enhanced_url,
+          postId: firstPost.postId,
+        });
+
+        setCredits((prev) => Math.max(0, prev - 1));
+        fireSuccessConfetti();
+      } else {
+        throw new Error("Enhancement failed");
+      }
+    } catch (error) {
+      console.error("Enhancement error:", error);
+
+      setPostStates((prev) => {
+        const next = new Map(prev);
+        next.set(firstPost.postId, {
+          state: "ready",
+          aiImage: firstPost.imageUrl,
+        });
+        return next;
+      });
+    }
 
     setIsProcessing(false);
-    setCredits((prev) => Math.max(0, prev - 1));
-  }, [posts]);
+  }, [posts, selectedStyle]);
 
   const handleOptimizeFull = useCallback(async () => {
     if (credits !== -1) return;
 
     setIsProcessing(true);
 
-    for (let i = 0; i < posts.length; i++) {
-      const post = posts[i];
+    const imageUrls = posts.map((p) => p.imageUrl);
 
-      setPostStates((prev) => {
-        const next = new Map(prev);
-        next.set(post.postId, { state: "scanning" });
-        return next;
+    try {
+      const result = await apiClient.batchEnhance(
+        imageUrls,
+        selectedStyle,
+        0.8,
+      );
+
+      result.enhanced_images.forEach((enhanced, index) => {
+        const post = posts[index];
+        if (post) {
+          setPostStates((prev) => {
+            const next = new Map(prev);
+            next.set(post.postId, {
+              state: "ready",
+              aiImage: enhanced.enhanced_url,
+            });
+            return next;
+          });
+        }
       });
 
-      await simulateAIProcessing(800);
+      fireSuccessConfetti();
+    } catch (error) {
+      console.error("Batch enhancement error:", error);
 
-      const mockAiImage = generateMockAiImage(post.imageUrl);
+      for (let i = 0; i < posts.length; i++) {
+        const post = posts[i];
 
-      setPostStates((prev) => {
-        const next = new Map(prev);
-        next.set(post.postId, { state: "ready", aiImage: mockAiImage });
-        return next;
-      });
+        setPostStates((prev) => {
+          const next = new Map(prev);
+          next.set(post.postId, { state: "scanning" });
+          return next;
+        });
+
+        await new Promise((resolve) => setTimeout(resolve, 800));
+
+        setPostStates((prev) => {
+          const next = new Map(prev);
+          next.set(post.postId, { state: "ready", aiImage: post.imageUrl });
+          return next;
+        });
+      }
     }
 
     setIsProcessing(false);
-    fireSuccessConfetti();
-  }, [posts, credits]);
+  }, [posts, credits, selectedStyle]);
 
   const handleUpgrade = useCallback(() => {
-    posts.slice(1).forEach((post, index) => {
+    posts.slice(1).forEach((post) => {
       setPostStates((prev) => {
         const next = new Map(prev);
         const existing = prev.get(post.postId);
@@ -273,6 +362,60 @@ function InstagramAIOptimizer() {
     setSelectedStyle(style);
   }, []);
 
+  const handleApplyEnhancement = useCallback(() => {
+    if (!enhancedPreview) return;
+
+    const post = posts.find((p) => p.postId === enhancedPreview.postId);
+    if (!post?.element) return;
+
+    const img = post.element.querySelector("img") as HTMLImageElement;
+    if (img) {
+      img.src = enhancedPreview.enhancedUrl;
+      img.srcset = "";
+    }
+
+    setPostStates((prev) => {
+      const next = new Map(prev);
+      next.set(enhancedPreview.postId, { state: "idle" });
+      return next;
+    });
+
+    setEnhancedPreview(null);
+    fireSuccessConfetti();
+  }, [enhancedPreview, posts]);
+
+  const handleDiscardEnhancement = useCallback(() => {
+    if (!enhancedPreview) return;
+
+    setPostStates((prev) => {
+      const next = new Map(prev);
+      next.set(enhancedPreview.postId, { state: "idle" });
+      return next;
+    });
+
+    setEnhancedPreview(null);
+  }, [enhancedPreview]);
+
+  const handleDownloadEnhancement = useCallback(async () => {
+    if (!enhancedPreview) return;
+
+    try {
+      const response = await fetch(enhancedPreview.enhancedUrl);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `enhanced-${enhancedPreview.postId}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Download failed:", error);
+    }
+  }, [enhancedPreview]);
+
   if (!isOnProfile) return null;
 
   return (
@@ -293,7 +436,11 @@ function InstagramAIOptimizer() {
         onOptimizeSingle={handleOptimizeSingle}
         onOptimizeFull={handleOptimizeFull}
         onUpgrade={handleUpgrade}
-        creatorInsights={DEFAULT_CREATOR_INSIGHTS}
+        creatorInsights={creatorInsights}
+        enhancedPreview={enhancedPreview}
+        onApplyEnhancement={handleApplyEnhancement}
+        onDiscardEnhancement={handleDiscardEnhancement}
+        onDownloadEnhancement={handleDownloadEnhancement}
       />
 
       <ConfettiCelebration trigger={showConfetti} />
@@ -318,14 +465,6 @@ function OverlayWrapper({ post, state, onUnlock }: OverlayWrapperProps) {
       onUnlock={onUnlock}
     />
   );
-}
-
-async function simulateAIProcessing(duration = 2000): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, duration));
-}
-
-function generateMockAiImage(originalUrl: string): string {
-  return originalUrl;
 }
 
 export default InstagramAIOptimizer;
