@@ -13,6 +13,29 @@ import {
 } from "./ai/agents/specialists"
 import { forge } from "./ai/agents/forge"
 
+// Simple structured logging for Convex
+const log = {
+  info: (component: string, message: string, data?: Record<string, unknown>) => {
+    const timestamp = new Date().toISOString()
+    console.log(JSON.stringify({ timestamp, level: "INFO", component, message, ...data }))
+  },
+  error: (component: string, message: string, error?: unknown, data?: Record<string, unknown>) => {
+    const timestamp = new Date().toISOString()
+    console.error(JSON.stringify({
+      timestamp,
+      level: "ERROR",
+      component,
+      message,
+      error: error instanceof Error ? { name: error.name, message: error.message, stack: error.stack } : String(error),
+      ...data,
+    }))
+  },
+  debug: (component: string, message: string, data?: Record<string, unknown>) => {
+    const timestamp = new Date().toISOString()
+    console.log(JSON.stringify({ timestamp, level: "DEBUG", component, message, ...data }))
+  },
+}
+
 export const enhanceWithChat = action({
   args: {
     imageUrl: v.string(),
@@ -29,14 +52,28 @@ export const enhanceWithChat = action({
   }> => {
     const startTime = Date.now()
 
+    log.info("ChatEnhance", "Starting enhancement", {
+      imageUrl: args.imageUrl.slice(0, 100),
+      userPrompt: args.userPrompt,
+    })
+
     const geminiApiKey = process.env.GEMINI_API_KEY
     const replicateApiKey = process.env.REPLICATE_API_TOKEN
 
+    log.debug("ChatEnhance", "Checking API keys", {
+      hasGeminiKey: !!geminiApiKey,
+      hasReplicateKey: !!replicateApiKey,
+    })
+
     if (!geminiApiKey || !replicateApiKey) {
+      log.error("ChatEnhance", "Missing API keys", undefined, {
+        hasGeminiKey: !!geminiApiKey,
+        hasReplicateKey: !!replicateApiKey,
+      })
       return {
         success: false,
         originalUrl: args.imageUrl,
-        error: "Missing API keys",
+        error: "Missing API keys. Please configure GEMINI_API_KEY and REPLICATE_API_TOKEN in Convex environment variables.",
         processingTimeMs: Date.now() - startTime,
       }
     }

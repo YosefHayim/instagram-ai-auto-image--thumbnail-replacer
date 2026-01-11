@@ -25,6 +25,7 @@ export function ImageGenerateButton({
         "hover:bg-primary-500 transition-all duration-200",
         "shadow-lg border border-white/10",
         "cursor-pointer",
+        "pointer-events-auto", // Enable clicks even when parent has pointer-events: none
         isProcessing && "opacity-50 pointer-events-none"
       )}
       onClick={(e) => {

@@ -22,12 +22,20 @@ export default defineContentScript({
   cssInjectionMode: "ui",
 
   async main(ctx) {
+    // Log immediately when content script starts
+    console.log("🚀 [IG-AI] Content script MAIN executing...");
+    console.log("🚀 [IG-AI] Current URL:", window.location.href);
+    console.log("🚀 [IG-AI] Pathname:", window.location.pathname);
+    console.log("🚀 [IG-AI] Timestamp:", new Date().toISOString());
+
     const ui = await createShadowRootUi(ctx, {
       name: "instagram-ai-optimizer",
       position: "inline",
       anchor: "body",
       append: "first",
       onMount: (container) => {
+        console.log("🚀 [IG-AI] Shadow root MOUNTED");
+
         const wrapper = document.createElement("div");
         wrapper.id = "instagram-ai-optimizer-root";
         container.appendChild(wrapper);
@@ -38,6 +46,7 @@ export default defineContentScript({
 
         const root = createRoot(wrapper);
         root.render(<InstagramAIOptimizer />);
+        console.log("🚀 [IG-AI] React component RENDERED");
         return { root, wrapper };
       },
       onRemove: (elements) => {
@@ -46,6 +55,7 @@ export default defineContentScript({
     });
 
     ui.mount();
+    console.log("🚀 [IG-AI] UI MOUNTED");
   },
 });
 
@@ -61,6 +71,8 @@ interface SelectedImage {
 }
 
 function InstagramAIOptimizer() {
+  console.log("🎯 [IG-AI] InstagramAIOptimizer component INITIALIZING");
+
   const [isOnProfile, setIsOnProfile] = useState(false);
   const [posts, setPosts] = useState<GridPost[]>([]);
   const [postStates, setPostStates] = useState<Map<string, PostState>>(
@@ -89,15 +101,21 @@ function InstagramAIOptimizer() {
 
   // Check if on profile page
   useEffect(() => {
+    console.log("🎯 [IG-AI] Profile check effect running...");
+    console.log("🎯 [IG-AI] Current pathname:", window.location.pathname);
+
     const manager = getInstagramFeedManager();
 
     const checkProfile = () => {
-      setIsOnProfile(manager.isOnProfilePage());
+      const onProfile = manager.isOnProfilePage();
+      console.log("🎯 [IG-AI] isOnProfilePage:", onProfile);
+      setIsOnProfile(onProfile);
     };
 
     checkProfile();
 
     const handleNavigation = () => {
+      console.log("🎯 [IG-AI] Navigation detected, rechecking...");
       setTimeout(checkProfile, 500);
     };
 
@@ -117,15 +135,25 @@ function InstagramAIOptimizer() {
 
   // Start feed manager on profile
   useEffect(() => {
-    if (!isOnProfile) return;
+    if (!isOnProfile) {
+      console.log("[IG-AI] Not on profile page, skipping feed manager");
+      return;
+    }
 
+    console.log("[IG-AI] On profile page, starting feed manager");
     const manager = getInstagramFeedManager();
     manager.start();
 
     const unsubscribe = manager.subscribe((newPosts) => {
+      console.log("[IG-AI] Feed manager found posts:", newPosts.length);
+      newPosts.forEach(p => console.log(`  - Post ${p.postId}:`, p.imageUrl.slice(0, 50)));
+
       setPosts((prev) => {
         const existing = new Set(prev.map((p) => p.postId));
         const filtered = newPosts.filter((p) => !existing.has(p.postId));
+        if (filtered.length > 0) {
+          console.log("[IG-AI] Adding", filtered.length, "new posts to state");
+        }
         return [...prev, ...filtered];
       });
     });
@@ -158,6 +186,49 @@ function InstagramAIOptimizer() {
         z-index: 10;
         pointer-events: none;
       `;
+
+      // Inject button styles directly since we're outside the shadow DOM
+      const styleEl = document.createElement("style");
+      styleEl.textContent = `
+        [data-ai-overlay] button {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          z-index: 20;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 10px;
+          background: rgba(0, 0, 0, 0.6);
+          backdrop-filter: blur(12px);
+          border-radius: 9999px;
+          color: white;
+          font-size: 12px;
+          font-weight: 600;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+          cursor: pointer;
+          pointer-events: auto;
+          transition: all 0.2s;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        [data-ai-overlay] button:hover {
+          background: #8b5cf6;
+          transform: scale(1.05);
+        }
+        [data-ai-overlay] button:active {
+          transform: scale(0.95);
+        }
+        [data-ai-overlay] button svg {
+          width: 14px;
+          height: 14px;
+        }
+        [data-ai-overlay] button.processing {
+          opacity: 0.5;
+          pointer-events: none;
+        }
+      `;
+      overlayContainer.appendChild(styleEl);
 
       const parentStyle = window.getComputedStyle(container);
       if (parentStyle.position === "static") {

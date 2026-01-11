@@ -190,11 +190,14 @@ export default defineBackground(() => {
         case "OPTIMIZE_IMAGE": {
           if (CONVEX_URL) {
             try {
-              const result = await convex.action(api.ai.enhance.enhanceImage, {
+              // Use chat enhancement with a default prompt based on style preset
+              const prompt = message.payload.stylePreset
+                ? `Make this image more ${message.payload.stylePreset}`
+                : "Enhance this image professionally for Instagram";
+
+              const result = await convex.action(api.chatEnhance.enhanceWithChat, {
                 imageUrl: message.payload.imageUrl,
-                stylePreset: message.payload.stylePreset,
-                enhancementLevel: "moderate",
-                useFullPipeline: false,
+                userPrompt: prompt,
               });
               sendResponse({
                 success: result.success,

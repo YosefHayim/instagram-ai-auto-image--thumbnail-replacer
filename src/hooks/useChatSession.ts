@@ -77,7 +77,14 @@ export function useChatSession(): UseChatSessionReturn {
 
   const sendMessage = useCallback(
     async (content: string) => {
-      if (!currentImage || isProcessing) return;
+      console.log("[ChatSession] sendMessage called with:", content);
+      console.log("[ChatSession] currentImage:", currentImage);
+      console.log("[ChatSession] isProcessing:", isProcessing);
+
+      if (!currentImage || isProcessing) {
+        console.log("[ChatSession] Aborted: no image or already processing");
+        return;
+      }
 
       // Add user message
       addMessage("user", content);
@@ -87,10 +94,15 @@ export function useChatSession(): UseChatSessionReturn {
         // Add initial system message
         addMessage("system", "Starting enhancement...");
 
+        console.log("[ChatSession] Starting enhancement stream...");
+        console.log("[ChatSession] Image URL:", currentImage.url);
+        console.log("[ChatSession] Prompt:", content);
+
         // Use streaming endpoint for real-time updates
         const stream = apiClient.enhanceWithStream(currentImage.url, content);
 
         for await (const update of stream) {
+          console.log("[ChatSession] Stream update:", update);
           setProcessingStage(update.stage);
 
           if (update.message) {
@@ -98,6 +110,9 @@ export function useChatSession(): UseChatSessionReturn {
           }
 
           if (update.stage === "complete" && update.status === "success") {
+            console.log("[ChatSession] Enhancement complete!");
+            console.log("[ChatSession] Enhanced URL:", update.enhanced_url);
+
             // Enhancement complete
             setEnhancedResult({
               originalUrl: currentImage.url,
@@ -115,11 +130,12 @@ export function useChatSession(): UseChatSessionReturn {
               }
             );
           } else if (update.stage === "error") {
+            console.error("[ChatSession] Enhancement error:", update.message);
             addMessage("assistant", `Sorry, something went wrong: ${update.message}`);
           }
         }
       } catch (error) {
-        console.error("Enhancement error:", error);
+        console.error("[ChatSession] Enhancement error:", error);
         addMessage(
           "assistant",
           `Sorry, I couldn't process that image. ${error instanceof Error ? error.message : "Please try again."}`
