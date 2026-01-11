@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 
-from routers import enhance_router, insights_router, styles_router
+from routers import enhance_router, insights_router, styles_router, agents_router
 from models import HealthResponse
 
 # Configure loguru
@@ -48,6 +48,7 @@ app.add_middleware(
 app.include_router(enhance_router)
 app.include_router(insights_router)
 app.include_router(styles_router)
+app.include_router(agents_router)
 
 
 @app.get("/", response_model=HealthResponse)

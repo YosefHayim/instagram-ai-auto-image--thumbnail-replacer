@@ -3,16 +3,20 @@ import { useState } from "react"
 import { BeforeAfterSlider } from "./BeforeAfterSlider"
 import { ScanningOverlay } from "./ScanningOverlay"
 import { LockedOverlay } from "./LockedOverlay"
+import { ImageGenerateButton } from "./ImageGenerateButton"
 import { cn, springConfig } from "@/lib/utils"
 
-export type OverlayState = "idle" | "scanning" | "ready" | "locked"
+export type OverlayState = "idle" | "button" | "scanning" | "ready" | "locked"
 
 interface ImageOverlayProps {
   originalImage: string
   aiImage?: string
   state: OverlayState
+  postId?: string
   index?: number
   onUnlock?: () => void
+  onGenerateClick?: (postId: string, imageUrl: string) => void
+  isProcessing?: boolean
   className?: string
 }
 
@@ -20,8 +24,11 @@ export function ImageOverlay({
   originalImage,
   aiImage,
   state,
+  postId = "",
   index = 0,
   onUnlock,
+  onGenerateClick,
+  isProcessing = false,
   className
 }: ImageOverlayProps) {
   const [hasInteracted, setHasInteracted] = useState(false)
@@ -30,6 +37,23 @@ export function ImageOverlay({
     if (position > 90 && !hasInteracted) {
       setHasInteracted(true)
     }
+  }
+
+  // For button state, only render the button without full overlay
+  if (state === "button") {
+    return (
+      <ImageGenerateButton
+        postId={postId}
+        imageUrl={originalImage}
+        onClick={onGenerateClick || (() => {})}
+        isProcessing={isProcessing}
+      />
+    )
+  }
+
+  // For idle state, render nothing
+  if (state === "idle") {
+    return null
   }
 
   return (
