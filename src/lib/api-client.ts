@@ -1,7 +1,16 @@
 import type { StylePreset } from "@/components/StylePresetsGrid";
 
+// Use Convex URL for chat enhancement, fall back to FastAPI for legacy endpoints
+const CONVEX_URL = import.meta.env.VITE_CONVEX_URL || "";
 const API_BASE_URL =
   import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+// Convex HTTP URL (derived from Convex URL)
+const getConvexHttpUrl = () => {
+  if (!CONVEX_URL) return API_BASE_URL;
+  // Convert https://xxx.convex.cloud to https://xxx.convex.site
+  return CONVEX_URL.replace(".convex.cloud", ".convex.site");
+};
 
 interface EnhanceResponse {
   success: boolean;
@@ -213,21 +222,79 @@ class APIClient {
     userPrompt: string,
     conversationId?: string,
   ): Promise<ChatEnhanceResponse> {
-    return this.request<ChatEnhanceResponse>("/api/agents/enhance", {
+    // Use Convex for chat enhancement
+    const convexUrl = getConvexHttpUrl();
+    const url = `${convexUrl}/api/agents/enhance`;
+
+    const response = await fetch(url, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         image_url: imageUrl,
         user_prompt: userPrompt,
         conversation_id: conversationId,
       }),
     });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: "Unknown error" }));
+      throw new Error(error.error || `HTTP ${response.status}`);
+    }
+
+    return response.json();
   }
 
   async *enhanceWithStream(
     imageUrl: string,
     userPrompt: string,
   ): AsyncGenerator<StreamingUpdate> {
-    const url = `${this.baseUrl}/api/agents/enhance-stream`;
+    // Convex doesn't support streaming, so we simulate it with the regular endpoint
+    // Yield progress updates while waiting for the result
+    const stages = [
+      { stage: "composition", status: "analyzing", message: "Analyzing composition and framing..." },
+      { stage: "lighting", status: "analyzing", message: "Evaluating lighting and exposure..." },
+      { stage: "color", status: "analyzing", message: "Enhancing color palette..." },
+      { stage: "mood", status: "analyzing", message: "Amplifying mood and atmosphere..." },
+      { stage: "detail", status: "analyzing", message: "Refining details and clarity..." },
+      { stage: "generation", status: "processing", message: "Generating your enhanced image..." },
+    ];
+
+    // Yield initial stages with delays to simulate progress
+    for (const stage of stages.slice(0, 5)) {
+      yield stage;
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+
+    // Yield generation stage
+    yield stages[5];
+
+    // Actually call the API
+    try {
+      const result = await this.enhanceWithPrompt(imageUrl, userPrompt);
+
+      yield {
+        stage: "complete",
+        status: "success",
+        enhanced_url: result.enhanced_url,
+        super_prompt: result.super_prompt,
+        processing_time_ms: result.processing_time_ms,
+      };
+    } catch (error) {
+      yield {
+        stage: "error",
+        status: "failed",
+        message: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  async analyzeOnly(
+    imageUrl: string,
+    userPrompt: string,
+  ): Promise<{ super_prompt: string; agent_summary: Record<string, unknown> }> {
+    // Use Convex for analysis
+    const convexUrl = getConvexHttpUrl();
+    const url = `${convexUrl}/api/agents/analyze-only`;
 
     const response = await fetch(url, {
       method: "POST",
@@ -239,53 +306,11 @@ class APIClient {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      const error = await response.json().catch(() => ({ error: "Unknown error" }));
+      throw new Error(error.error || `HTTP ${response.status}`);
     }
 
-    const reader = response.body?.getReader();
-    const decoder = new TextDecoder();
-
-    if (!reader) {
-      throw new Error("No response body");
-    }
-
-    let buffer = "";
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split("\n");
-      buffer = lines.pop() || "";
-
-      for (const line of lines) {
-        if (line.startsWith("data: ")) {
-          try {
-            const data = JSON.parse(line.slice(6));
-            yield data as StreamingUpdate;
-          } catch {
-            // Ignore parse errors
-          }
-        }
-      }
-    }
-  }
-
-  async analyzeOnly(
-    imageUrl: string,
-    userPrompt: string,
-  ): Promise<{ super_prompt: string; agent_summary: Record<string, unknown> }> {
-    return this.request<{
-      super_prompt: string;
-      agent_summary: Record<string, unknown>;
-    }>("/api/agents/analyze-only", {
-      method: "POST",
-      body: JSON.stringify({
-        image_url: imageUrl,
-        user_prompt: userPrompt,
-      }),
-    });
+    return response.json();
   }
 }
 
