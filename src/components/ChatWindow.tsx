@@ -22,6 +22,7 @@ export function ChatWindow({
   onAccept,
   onBulkPrompt,
 }: ChatWindowProps) {
+  console.log("💬 [ChatWindow] Rendering, isOpen:", isOpen, "selectedImage:", selectedImage?.postId);
   const {
     messages,
     isProcessing,
@@ -102,7 +103,7 @@ export function ChatWindow({
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9998]"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[99999998]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -112,7 +113,7 @@ export function ChatWindow({
           {/* Chat Window */}
           <motion.div
             className={cn(
-              "fixed right-0 top-0 bottom-0 z-[9999]",
+              "fixed right-0 top-0 bottom-0 z-[99999999]",
               "w-full max-w-md",
               "bg-gray-50 shadow-2xl",
               "flex flex-col"

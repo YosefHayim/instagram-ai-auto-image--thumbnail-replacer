@@ -8,16 +8,10 @@
  * @module
  */
 
-import type * as ai_agents_artist from "../ai/agents/artist.js";
-import type * as ai_agents_curator from "../ai/agents/curator.js";
 import type * as ai_agents_forge from "../ai/agents/forge.js";
-import type * as ai_agents_intake from "../ai/agents/intake.js";
-import type * as ai_agents_strategist from "../ai/agents/strategist.js";
-import type * as ai_agents_vision from "../ai/agents/vision.js";
-import type * as ai_enhance from "../ai/enhance.js";
+import type * as ai_agents_specialists from "../ai/agents/specialists.js";
 import type * as ai_gemini from "../ai/gemini.js";
-import type * as ai_pipeline from "../ai/pipeline.js";
-import type * as ai_types from "../ai/types.js";
+import type * as chatEnhance from "../chatEnhance.js";
 import type * as http from "../http.js";
 import type * as optimizations from "../optimizations.js";
 import type * as profiles from "../profiles.js";
@@ -30,16 +24,10 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
-  "ai/agents/artist": typeof ai_agents_artist;
-  "ai/agents/curator": typeof ai_agents_curator;
   "ai/agents/forge": typeof ai_agents_forge;
-  "ai/agents/intake": typeof ai_agents_intake;
-  "ai/agents/strategist": typeof ai_agents_strategist;
-  "ai/agents/vision": typeof ai_agents_vision;
-  "ai/enhance": typeof ai_enhance;
+  "ai/agents/specialists": typeof ai_agents_specialists;
   "ai/gemini": typeof ai_gemini;
-  "ai/pipeline": typeof ai_pipeline;
-  "ai/types": typeof ai_types;
+  chatEnhance: typeof chatEnhance;
   http: typeof http;
   optimizations: typeof optimizations;
   profiles: typeof profiles;

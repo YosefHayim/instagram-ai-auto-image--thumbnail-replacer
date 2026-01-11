@@ -28,6 +28,28 @@ export default defineContentScript({
     console.log("🚀 [IG-AI] Pathname:", window.location.pathname);
     console.log("🚀 [IG-AI] Timestamp:", new Date().toISOString());
 
+    // Add document-level event capture to intercept clicks on our overlay buttons
+    // This runs before any Instagram handlers
+    document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      const overlay = target.closest('[data-ai-overlay]');
+      if (overlay && target.tagName === 'BUTTON') {
+        console.log("🚀 [IG-AI] Document captured button click in overlay!");
+        // Don't prevent here - let the button's own handler fire
+      }
+    }, true);
+
+    // Prevent Instagram from handling clicks on our buttons by intercepting link clicks
+    document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      // Check if click is on or inside our button
+      if (target.closest('[data-ai-overlay] button')) {
+        console.log("🚀 [IG-AI] Preventing link navigation for overlay button click");
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, true);
+
     const ui = await createShadowRootUi(ctx, {
       name: "instagram-ai-optimizer",
       position: "inline",
@@ -183,49 +205,51 @@ function InstagramAIOptimizer() {
         left: 0;
         right: 0;
         bottom: 0;
-        z-index: 10;
+        z-index: 999999;
         pointer-events: none;
+        isolation: isolate;
       `;
+      console.log("🎯 [IG-AI] Creating overlay container for post:", post.postId);
 
       // Inject button styles directly since we're outside the shadow DOM
       const styleEl = document.createElement("style");
       styleEl.textContent = `
         [data-ai-overlay] button {
-          position: absolute;
-          top: 8px;
-          right: 8px;
-          z-index: 20;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          padding: 6px 10px;
-          background: rgba(0, 0, 0, 0.6);
-          backdrop-filter: blur(12px);
-          border-radius: 9999px;
-          color: white;
-          font-size: 12px;
-          font-weight: 600;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-          cursor: pointer;
-          pointer-events: auto;
-          transition: all 0.2s;
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+          position: absolute !important;
+          top: 8px !important;
+          right: 8px !important;
+          z-index: 999999 !important;
+          display: flex !important;
+          align-items: center !important;
+          gap: 6px !important;
+          padding: 8px 12px !important;
+          background: #9333ea !important;
+          backdrop-filter: blur(12px) !important;
+          border-radius: 9999px !important;
+          color: white !important;
+          font-size: 13px !important;
+          font-weight: 700 !important;
+          border: 2px solid white !important;
+          box-shadow: 0 4px 20px rgba(147, 51, 234, 0.5) !important;
+          cursor: pointer !important;
+          pointer-events: auto !important;
+          transition: all 0.2s !important;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
         }
         [data-ai-overlay] button:hover {
-          background: #8b5cf6;
-          transform: scale(1.05);
+          background: #a855f7 !important;
+          transform: scale(1.05) !important;
         }
         [data-ai-overlay] button:active {
-          transform: scale(0.95);
+          transform: scale(0.95) !important;
         }
         [data-ai-overlay] button svg {
-          width: 14px;
-          height: 14px;
+          width: 16px !important;
+          height: 16px !important;
         }
         [data-ai-overlay] button.processing {
-          opacity: 0.5;
-          pointer-events: none;
+          opacity: 0.5 !important;
+          pointer-events: none !important;
         }
       `;
       overlayContainer.appendChild(styleEl);
@@ -258,8 +282,12 @@ function InstagramAIOptimizer() {
 
   // Handle generate button click
   const handleGenerateClick = useCallback((postId: string, imageUrl: string) => {
+    console.log("🎯 [IG-AI] handleGenerateClick called!");
+    console.log("🎯 [IG-AI] postId:", postId);
+    console.log("🎯 [IG-AI] imageUrl:", imageUrl.slice(0, 50));
     setSelectedImage({ postId, url: imageUrl });
     setIsChatOpen(true);
+    console.log("🎯 [IG-AI] Chat should now be open");
   }, []);
 
   // Handle enhancement accept
