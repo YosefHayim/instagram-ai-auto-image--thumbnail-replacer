@@ -23,6 +23,14 @@ export function ChatWindow({
   onBulkPrompt,
 }: ChatWindowProps) {
   console.log("💬 [ChatWindow] Rendering, isOpen:", isOpen, "selectedImage:", selectedImage?.postId);
+
+  // Debug: log when isOpen changes
+  useEffect(() => {
+    if (isOpen) {
+      console.log("💬 [ChatWindow] OPENING - isOpen is true!");
+      console.log("💬 [ChatWindow] selectedImage:", selectedImage);
+    }
+  }, [isOpen, selectedImage]);
   const {
     messages,
     isProcessing,

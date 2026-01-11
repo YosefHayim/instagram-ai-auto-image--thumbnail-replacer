@@ -115,6 +115,50 @@ function InstagramAIOptimizer() {
     console.log("💬 [IG-AI] Chat state changed - isChatOpen:", isChatOpen, "selectedImage:", selectedImage?.postId);
   }, [isChatOpen, selectedImage]);
 
+  // Render ChatWindow outside shadow DOM for proper fixed positioning
+  const chatContainerRef = useRef<HTMLDivElement | null>(null);
+  const chatRootRef = useRef<ReturnType<typeof createRoot> | null>(null);
+
+  useEffect(() => {
+    // Create container for ChatWindow outside shadow DOM
+    if (!chatContainerRef.current) {
+      const container = document.createElement("div");
+      container.id = "ig-ai-chat-container";
+      container.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 0;
+        z-index: 2147483647;
+        pointer-events: none;
+      `;
+      document.body.appendChild(container);
+      chatContainerRef.current = container;
+
+      // Inject styles for the chat window
+      const style = document.createElement("style");
+      style.textContent = cssText;
+      container.appendChild(style);
+
+      chatRootRef.current = createRoot(container);
+      console.log("💬 [IG-AI] Chat container created outside shadow DOM");
+    }
+
+    return () => {
+      if (chatContainerRef.current) {
+        chatRootRef.current?.unmount();
+        chatContainerRef.current.remove();
+        chatContainerRef.current = null;
+        chatRootRef.current = null;
+      }
+    };
+  }, []);
+
+  // Refs for ChatWindow callbacks (to avoid stale closures)
+  const handleAcceptEnhancementRef = useRef<(postId: string, enhancedUrl: string) => void>();
+  const handleBulkPromptRef = useRef<(prompt: string) => void>();
+
   // Bulk state
   const [showBulkDialog, setShowBulkDialog] = useState(false);
   const {
@@ -286,19 +330,30 @@ function InstagramAIOptimizer() {
       `;
 
       // Add click handler
-      button.addEventListener("click", (e) => {
+      const clickHandler = (e: Event) => {
         console.log("🔘 [Button] CLICKED! postId:", post.postId);
+
+        // Visual feedback - change button color to confirm click worked
+        button.style.background = "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)";
+        button.querySelector("span")!.textContent = "Opening...";
+
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
 
         if (handleGenerateClickRef.current) {
+          console.log("🔘 [Button] Calling handleGenerateClickRef...");
           handleGenerateClickRef.current(post.postId, post.imageUrl);
+          console.log("🔘 [Button] handleGenerateClickRef called!");
         } else {
-          console.error("🔘 [Button] handleGenerateClickRef is not set!");
+          console.error("🔘 [Button] handleGenerateClickRef is NOT set!");
+          alert("Error: Click handler not initialized. Please refresh the page.");
         }
         return false;
-      }, true);
+      };
+
+      button.addEventListener("click", clickHandler, true);
+      button.onclick = clickHandler; // Also set onclick as backup
 
       // Add hover effects
       button.addEventListener("mouseenter", () => {
@@ -442,21 +497,41 @@ function InstagramAIOptimizer() {
     cancelBulk();
   }, [cancelBulk]);
 
+  // Update refs for ChatWindow callbacks
+  useEffect(() => {
+    handleAcceptEnhancementRef.current = handleAcceptEnhancement;
+    handleBulkPromptRef.current = handleBulkPrompt;
+  }, [handleAcceptEnhancement, handleBulkPrompt]);
+
+  // Render ChatWindow when state changes
+  useEffect(() => {
+    if (chatRootRef.current) {
+      console.log("💬 [IG-AI] Rendering ChatWindow outside shadow DOM, isOpen:", isChatOpen);
+      chatRootRef.current.render(
+        <ChatWindow
+          isOpen={isChatOpen}
+          onClose={() => {
+            console.log("💬 [IG-AI] ChatWindow onClose called");
+            setIsChatOpen(false);
+            setSelectedImage(null);
+          }}
+          selectedImage={selectedImage}
+          onAccept={(postId, enhancedUrl) => {
+            handleAcceptEnhancementRef.current?.(postId, enhancedUrl);
+          }}
+          onBulkPrompt={(prompt) => {
+            handleBulkPromptRef.current?.(prompt);
+          }}
+        />
+      );
+    }
+  }, [isChatOpen, selectedImage]);
+
   if (!isOnProfile) return null;
 
   return (
     <LayoutGroup>
-      {/* Chat Window */}
-      <ChatWindow
-        isOpen={isChatOpen}
-        onClose={() => {
-          setIsChatOpen(false);
-          setSelectedImage(null);
-        }}
-        selectedImage={selectedImage}
-        onAccept={handleAcceptEnhancement}
-        onBulkPrompt={handleBulkPrompt}
-      />
+      {/* ChatWindow is rendered outside shadow DOM via useEffect */}
 
       {/* Bulk Confirm Dialog */}
       <BulkConfirmDialog
