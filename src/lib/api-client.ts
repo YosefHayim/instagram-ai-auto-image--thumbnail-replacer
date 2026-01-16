@@ -1,11 +1,7 @@
 // Convex URL for chat enhancement
 const CONVEX_URL = import.meta.env.VITE_CONVEX_URL || "";
 
-// Image generation provider type
-export type ImageProvider = "replicate" | "openai";
-
-// Default provider - OpenAI for best quality
-const DEFAULT_PROVIDER: ImageProvider = "openai";
+import { ImageProvider, DEFAULT_PROVIDER } from "./types";
 
 // Convex HTTP URL (derived from Convex URL)
 const getConvexHttpUrl = () => {
@@ -98,7 +94,9 @@ class APIClient {
     console.log("[APIClient] Response status:", response.status);
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: "Unknown error" }));
+      const error = await response
+        .json()
+        .catch(() => ({ error: "Unknown error" }));
       console.error("[APIClient] Error response:", error);
       throw new Error(error.error || `HTTP ${response.status}`);
     }
@@ -131,19 +129,43 @@ class APIClient {
 
     // Progress stages shown while waiting for API
     const stages = [
-      { stage: "composition", status: "analyzing", message: "Analyzing composition and framing..." },
-      { stage: "lighting", status: "analyzing", message: "Evaluating lighting and exposure..." },
-      { stage: "color", status: "analyzing", message: "Enhancing color palette..." },
-      { stage: "mood", status: "analyzing", message: "Amplifying mood and atmosphere..." },
-      { stage: "detail", status: "analyzing", message: "Refining details and clarity..." },
-      { stage: "generation", status: "processing", message: "Generating your enhanced image..." },
+      {
+        stage: "composition",
+        status: "analyzing",
+        message: "Analyzing composition and framing...",
+      },
+      {
+        stage: "lighting",
+        status: "analyzing",
+        message: "Evaluating lighting and exposure...",
+      },
+      {
+        stage: "color",
+        status: "analyzing",
+        message: "Enhancing color palette...",
+      },
+      {
+        stage: "mood",
+        status: "analyzing",
+        message: "Amplifying mood and atmosphere...",
+      },
+      {
+        stage: "detail",
+        status: "analyzing",
+        message: "Refining details and clarity...",
+      },
+      {
+        stage: "generation",
+        status: "processing",
+        message: "Generating your enhanced image...",
+      },
     ];
 
     // Yield initial stages with delays to simulate progress
     for (const stage of stages.slice(0, 5)) {
       console.log("[APIClient] Yielding stage:", stage.stage);
       yield stage;
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
     }
 
     // Yield generation stage
@@ -153,7 +175,11 @@ class APIClient {
     // Actually call the API
     try {
       console.log("[APIClient] Calling enhanceWithPrompt...");
-      const result = await this.enhanceWithPrompt(imageUrl, userPrompt, activeProvider);
+      const result = await this.enhanceWithPrompt(
+        imageUrl,
+        userPrompt,
+        activeProvider,
+      );
       console.log("[APIClient] Got result, success:", result.success);
 
       if (result.success) {
@@ -203,7 +229,9 @@ class APIClient {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: "Unknown error" }));
+      const error = await response
+        .json()
+        .catch(() => ({ error: "Unknown error" }));
       throw new Error(error.error || `HTTP ${response.status}`);
     }
 

@@ -47,3 +47,4 @@ build
 *.log
 *.tmp
 .cache
+client_secret_*.json
