@@ -1,32 +1,35 @@
-import { v } from "convex/values"
-import { mutation, query } from "./_generated/server"
+import { v } from "convex/values";
+import { mutation, query } from "./_generated/server";
 
 export const getByUserId = query({
-  args: { odch123: v.string() },
+  args: { userId: v.id("users") },
   handler: async (ctx, args) => {
     return await ctx.db
       .query("optimizations")
-      .withIndex("by_odch123", (q) => q.eq("odch123", args.odch123))
+      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
       .order("desc")
-      .collect()
+      .collect();
   },
-})
+});
 
 export const create = mutation({
   args: {
-    odch123: v.string(),
+    userId: v.id("users"),
     originalUrl: v.string(),
-    stylePreset: v.optional(v.string()),
+    preset: v.optional(v.string()),
+    customPrompt: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("optimizations", {
-      odch123: args.odch123,
+      userId: args.userId,
       originalUrl: args.originalUrl,
       status: "pending",
-      stylePreset: args.stylePreset,
-    })
+      preset: args.preset,
+      customPrompt: args.customPrompt,
+      createdAt: Date.now(),
+    });
   },
-})
+});
 
 export const updateStatus = mutation({
   args: {
@@ -35,30 +38,38 @@ export const updateStatus = mutation({
       v.literal("pending"),
       v.literal("processing"),
       v.literal("completed"),
-      v.literal("failed")
+      v.literal("failed"),
     ),
-    aiUrl: v.optional(v.string()),
+    enhancedUrl: v.optional(v.string()),
+    processingTimeMs: v.optional(v.number()),
+    errorMessage: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const update: {
-      status: "pending" | "processing" | "completed" | "failed"
-      aiUrl?: string
-    } = {
+    const update: Record<string, unknown> = {
       status: args.status,
+    };
+
+    if (args.enhancedUrl) {
+      update.enhancedUrl = args.enhancedUrl;
+    }
+    if (args.processingTimeMs) {
+      update.processingTimeMs = args.processingTimeMs;
+    }
+    if (args.errorMessage) {
+      update.errorMessage = args.errorMessage;
+    }
+    if (args.status === "completed") {
+      update.completedAt = Date.now();
     }
 
-    if (args.aiUrl) {
-      update.aiUrl = args.aiUrl
-    }
-
-    await ctx.db.patch(args.optimizationId, update)
-    return { success: true }
+    await ctx.db.patch(args.optimizationId, update);
+    return { success: true };
   },
-})
+});
 
 export const getById = query({
   args: { optimizationId: v.id("optimizations") },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.optimizationId)
+    return await ctx.db.get(args.optimizationId);
   },
-})
+});
