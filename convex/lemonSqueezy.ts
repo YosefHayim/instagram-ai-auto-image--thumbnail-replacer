@@ -27,7 +27,14 @@ export const handleWebhook = httpAction(async (ctx, request) => {
     return new Response("Invalid signature", { status: 401 });
   }
 
-  const payload = JSON.parse(rawBody);
+  let payload;
+  try {
+    payload = JSON.parse(rawBody);
+  } catch {
+    console.error("[LemonSqueezy] Invalid JSON payload");
+    return new Response("Invalid JSON payload", { status: 400 });
+  }
+
   const eventName = payload.meta.event_name;
   const data = payload.data;
 
@@ -305,7 +312,7 @@ export const createCheckout = action({
 
 export const getPortalUrl = action({
   args: { userId: v.string() },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<{ portalUrl: string }> => {
     const apiKey = process.env.LEMON_SQUEEZY_API_KEY;
     if (!apiKey) {
       throw new Error("Missing LEMON_SQUEEZY_API_KEY");
@@ -319,7 +326,7 @@ export const getPortalUrl = action({
       throw new Error("User has no Lemon Squeezy customer ID");
     }
 
-    const response = await fetch(
+    const response: Response = await fetch(
       `https://api.lemonsqueezy.com/v1/customers/${user.lemonSqueezyCustomerId}`,
       {
         headers: {
@@ -333,7 +340,9 @@ export const getPortalUrl = action({
       throw new Error("Failed to get customer data");
     }
 
-    const data = await response.json();
+    const data: {
+      data: { attributes: { urls: { customer_portal: string } } };
+    } = await response.json();
     return { portalUrl: data.data.attributes.urls.customer_portal };
   },
 });
