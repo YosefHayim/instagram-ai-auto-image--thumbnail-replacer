@@ -22,9 +22,8 @@ export async function callGemini(
   systemPrompt: string,
   userPrompt: string,
   imageUrl?: string,
+  model: string = "gemini-2.5-pro-preview-06-05",
 ): Promise<string> {
-  const model = "gemini-2.5-pro-preview-06-05";
-
   const parts: GeminiMessage["parts"] = [];
 
   if (imageUrl) {
@@ -200,6 +199,7 @@ Analyze this image and create a detailed enhancement prompt that will:
 
 Respond with ONLY a detailed image generation prompt, no explanations.`,
     imageUrl,
+    modelId,
   );
 
   return enhancedPrompt.trim();

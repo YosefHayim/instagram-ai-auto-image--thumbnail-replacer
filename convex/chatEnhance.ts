@@ -124,11 +124,15 @@ export const enhanceWithChat = action({
     if (provider === "openai" && !openaiApiKey) {
       missingKeys.push("OPENAI_API_KEY");
     }
-    if (provider === "gemini" && !geminiApiKey) {
-      missingKeys.push("GEMINI_API_KEY");
+    if (provider === "gemini") {
+      if (!geminiApiKey) missingKeys.push("GEMINI_API_KEY");
+      if (!replicateApiKey)
+        missingKeys.push("REPLICATE_API_TOKEN (for image generation)");
     }
-    if (provider === "claude" && !claudeApiKey) {
-      missingKeys.push("ANTHROPIC_API_KEY");
+    if (provider === "claude") {
+      if (!claudeApiKey) missingKeys.push("ANTHROPIC_API_KEY");
+      if (!replicateApiKey)
+        missingKeys.push("REPLICATE_API_TOKEN (for image generation)");
     }
 
     if (missingKeys.length > 0) {
@@ -201,21 +205,59 @@ export const enhanceWithChat = action({
           });
           break;
 
-        case "gemini":
-          enhancedUrl = await geminiForge(geminiApiKey!, {
+        case "gemini": {
+          const geminiPrompt = await geminiForge(geminiApiKey!, {
             imageUrl: args.imageUrl,
             prompt: superPrompt,
             model: "gemini-2.0-flash",
           });
+          enhancedUrl = await forge(
+            { imageUrl: args.imageUrl },
+            {
+              mainPrompt: geminiPrompt,
+              negativePrompt:
+                "blur, noise, artifacts, oversaturated, overexposed, underexposed, distorted, low quality",
+              styleModifiers: ["instagram-ready"],
+              contentTypeModifiers: [],
+              platformModifiers: ["feed"],
+              technicalParameters: {
+                strength: 0.4,
+                guidanceScale: 7.5,
+                steps: 30,
+              },
+              model: "flux",
+            },
+            replicateApiKey!,
+          );
           break;
+        }
 
-        case "claude":
-          enhancedUrl = await claudeForge(claudeApiKey!, {
+        case "claude": {
+          const claudePrompt = await claudeForge(claudeApiKey!, {
             imageUrl: args.imageUrl,
             prompt: superPrompt,
             model: "claude-3-5-sonnet",
           });
+          enhancedUrl = await forge(
+            { imageUrl: args.imageUrl },
+            {
+              mainPrompt: claudePrompt,
+              negativePrompt:
+                "blur, noise, artifacts, oversaturated, overexposed, underexposed, distorted, low quality",
+              styleModifiers: ["instagram-ready"],
+              contentTypeModifiers: [],
+              platformModifiers: ["feed"],
+              technicalParameters: {
+                strength: 0.4,
+                guidanceScale: 7.5,
+                steps: 30,
+              },
+              model: "flux",
+            },
+            replicateApiKey!,
+          );
           break;
+        }
 
         case "replicate":
         default:
