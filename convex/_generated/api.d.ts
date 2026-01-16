@@ -10,13 +10,16 @@
 
 import type * as ai_agents_forge from "../ai/agents/forge.js";
 import type * as ai_agents_specialists from "../ai/agents/specialists.js";
+import type * as ai_claude from "../ai/claude.js";
 import type * as ai_gemini from "../ai/gemini.js";
 import type * as ai_openai from "../ai/openai.js";
 import type * as chatEnhance from "../chatEnhance.js";
 import type * as http from "../http.js";
+import type * as lemonSqueezy from "../lemonSqueezy.js";
 import type * as optimizations from "../optimizations.js";
-import type * as profiles from "../profiles.js";
+import type * as presets from "../presets.js";
 import type * as stripe from "../stripe.js";
+import type * as users from "../users.js";
 
 import type {
   ApiFromModules,
@@ -27,13 +30,16 @@ import type {
 declare const fullApi: ApiFromModules<{
   "ai/agents/forge": typeof ai_agents_forge;
   "ai/agents/specialists": typeof ai_agents_specialists;
+  "ai/claude": typeof ai_claude;
   "ai/gemini": typeof ai_gemini;
   "ai/openai": typeof ai_openai;
   chatEnhance: typeof chatEnhance;
   http: typeof http;
+  lemonSqueezy: typeof lemonSqueezy;
   optimizations: typeof optimizations;
-  profiles: typeof profiles;
+  presets: typeof presets;
   stripe: typeof stripe;
+  users: typeof users;
 }>;
 
 /**

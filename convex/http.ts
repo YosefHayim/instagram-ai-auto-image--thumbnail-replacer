@@ -1,24 +1,24 @@
-import { httpRouter } from "convex/server"
-import { httpAction } from "./_generated/server"
-import { api } from "./_generated/api"
+import { httpRouter } from "convex/server";
+import { httpAction } from "./_generated/server";
+import { api } from "./_generated/api";
 
-const http = httpRouter()
+const http = httpRouter();
 
 // CORS headers for browser extension
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
-}
+};
 
 // Handle CORS preflight
 http.route({
   path: "/api/agents/enhance",
   method: "OPTIONS",
   handler: httpAction(async () => {
-    return new Response(null, { status: 204, headers: corsHeaders })
+    return new Response(null, { status: 204, headers: corsHeaders });
   }),
-})
+});
 
 // Chat-based enhancement endpoint
 http.route({
@@ -26,30 +26,43 @@ http.route({
   method: "POST",
   handler: httpAction(async (ctx, request) => {
     try {
-      const body = await request.json()
-      const { image_url, user_prompt, provider } = body
+      const body = await request.json();
+      const { image_url, user_prompt, provider } = body;
 
       if (!image_url || !user_prompt) {
         return new Response(
           JSON.stringify({ error: "Missing image_url or user_prompt" }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        )
+          {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
       }
 
       // Validate provider if provided
-      const validProviders = ["replicate", "openai"]
+      const validProviders = ["replicate", "openai", "gemini", "claude"];
       if (provider && !validProviders.includes(provider)) {
         return new Response(
-          JSON.stringify({ error: `Invalid provider. Must be one of: ${validProviders.join(", ")}` }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        )
+          JSON.stringify({
+            error: `Invalid provider. Must be one of: ${validProviders.join(", ")}`,
+          }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
       }
 
       const result = await ctx.runAction(api.chatEnhance.enhanceWithChat, {
         imageUrl: image_url,
         userPrompt: user_prompt,
-        provider: provider as "replicate" | "openai" | undefined,
-      })
+        provider: provider as
+          | "replicate"
+          | "openai"
+          | "gemini"
+          | "claude"
+          | undefined,
+      });
 
       return new Response(
         JSON.stringify({
@@ -70,70 +83,79 @@ http.route({
         {
           status: result.success ? 200 : 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      )
+        },
+      );
     } catch (error) {
-      console.error("Enhancement error:", error)
-      return new Response(
-        JSON.stringify({ error: String(error) }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      )
+      console.error("Enhancement error:", error);
+      return new Response(JSON.stringify({ error: String(error) }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
   }),
-})
+});
 
 // Analyze only endpoint (no image generation)
 http.route({
   path: "/api/agents/analyze-only",
   method: "OPTIONS",
   handler: httpAction(async () => {
-    return new Response(null, { status: 204, headers: corsHeaders })
+    return new Response(null, { status: 204, headers: corsHeaders });
   }),
-})
+});
 
 http.route({
   path: "/api/agents/analyze-only",
   method: "POST",
   handler: httpAction(async (ctx, request) => {
     try {
-      const body = await request.json()
-      const { image_url, user_prompt } = body
+      const body = await request.json();
+      const { image_url, user_prompt } = body;
 
       if (!image_url || !user_prompt) {
         return new Response(
           JSON.stringify({ error: "Missing image_url or user_prompt" }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        )
+          {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
       }
 
       const result = await ctx.runAction(api.chatEnhance.analyzeOnly, {
         imageUrl: image_url,
         userPrompt: user_prompt,
-      })
+      });
 
       return new Response(
         JSON.stringify({
           super_prompt: result.superPrompt,
-          agent_summary: result.agentAnalyses.reduce((acc, a) => {
-            acc[a.agentName.toLowerCase().replace("agent", "")] = {
-              confidence: a.confidence,
-              observations: a.observations,
-              directive: a.enhancementDirective,
-            }
-            return acc
-          }, {} as Record<string, unknown>),
+          agent_summary: result.agentAnalyses.reduce(
+            (acc, a) => {
+              acc[a.agentName.toLowerCase().replace("agent", "")] = {
+                confidence: a.confidence,
+                observations: a.observations,
+                directive: a.enhancementDirective,
+              };
+              return acc;
+            },
+            {} as Record<string, unknown>,
+          ),
         }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      )
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
     } catch (error) {
-      console.error("Analysis error:", error)
-      return new Response(
-        JSON.stringify({ error: String(error) }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      )
+      console.error("Analysis error:", error);
+      return new Response(JSON.stringify({ error: String(error) }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
   }),
-})
+});
 
 // Health check
 http.route({
@@ -149,38 +171,41 @@ http.route({
           enhancement: "operational",
         },
       }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    )
+      {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
   }),
-})
+});
 
 // Stripe webhook
 http.route({
   path: "/stripe-webhook",
   method: "POST",
   handler: httpAction(async (ctx, request) => {
-    const signature = request.headers.get("stripe-signature")
+    const signature = request.headers.get("stripe-signature");
     if (!signature) {
-      return new Response("No signature", { status: 400 })
+      return new Response("No signature", { status: 400 });
     }
 
-    const payload = await request.text()
+    const payload = await request.text();
 
     try {
       await ctx.runAction(api.stripe.handleWebhook, {
         payload,
         signature,
-      })
+      });
 
       return new Response(JSON.stringify({ received: true }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
-      })
+      });
     } catch (error) {
-      console.error("Webhook error:", error)
-      return new Response("Webhook error", { status: 400 })
+      console.error("Webhook error:", error);
+      return new Response("Webhook error", { status: 400 });
     }
   }),
-})
+});
 
-export default http
+export default http;
