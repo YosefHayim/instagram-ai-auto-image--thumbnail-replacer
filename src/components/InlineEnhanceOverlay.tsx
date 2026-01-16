@@ -1,9 +1,11 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Coins } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PresetSelector, type Preset, DEFAULT_PRESETS } from "./PresetSelector";
+import { ProviderSelector, getSavedProvider } from "./ProviderSelector";
 import { BeforeAfterSlider } from "./BeforeAfterSlider";
+import { type ImageProvider, DEFAULT_PROVIDER } from "@/lib/types";
 
 type OverlayMode = "select" | "processing" | "compare";
 
@@ -12,7 +14,7 @@ interface InlineEnhanceOverlayProps {
   postId: string;
   onClose: () => void;
   onApply: (enhancedUrl: string) => void;
-  onEnhance: (preset: Preset) => Promise<string>;
+  onEnhance: (preset: Preset, provider: ImageProvider) => Promise<string>;
   credits?: number;
   className?: string;
 }
@@ -30,8 +32,14 @@ export function InlineEnhanceOverlay({
   const [selectedPreset, setSelectedPreset] = useState<Preset | null>(
     DEFAULT_PRESETS.find((p) => p.isDefault) || DEFAULT_PRESETS[0],
   );
+  const [selectedProvider, setSelectedProvider] =
+    useState<ImageProvider>(DEFAULT_PROVIDER);
   const [enhancedImage, setEnhancedImage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    getSavedProvider().then(setSelectedProvider);
+  }, []);
 
   const handleEnhance = useCallback(async () => {
     if (!selectedPreset) return;
@@ -40,14 +48,14 @@ export function InlineEnhanceOverlay({
     setError(null);
 
     try {
-      const result = await onEnhance(selectedPreset);
+      const result = await onEnhance(selectedPreset, selectedProvider);
       setEnhancedImage(result);
       setMode("compare");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Enhancement failed");
       setMode("select");
     }
-  }, [selectedPreset, onEnhance]);
+  }, [selectedPreset, selectedProvider, onEnhance]);
 
   const handleApply = useCallback(() => {
     if (enhancedImage) {
@@ -81,6 +89,10 @@ export function InlineEnhanceOverlay({
           <span className="text-white text-sm font-medium">Enhance Image</span>
         </div>
         <div className="flex items-center gap-3">
+          <ProviderSelector
+            selectedProvider={selectedProvider}
+            onSelect={setSelectedProvider}
+          />
           <div className="flex items-center gap-1.5 text-xs">
             <Coins className="w-3.5 h-3.5 text-yellow-400" />
             <span className="text-white font-medium">{credits}</span>
@@ -163,7 +175,8 @@ export function InlineEnhanceOverlay({
               </div>
               <p className="text-white font-medium mb-1">Enhancing Image</p>
               <p className="text-gray-400 text-sm">
-                Using {selectedPreset?.name} preset...
+                Using {selectedPreset?.name} with{" "}
+                {selectedProvider.toUpperCase()}...
               </p>
             </motion.div>
           )}

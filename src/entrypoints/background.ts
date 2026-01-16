@@ -7,7 +7,6 @@ export default defineBackground(() => {
 
   const convex = new ConvexHttpClient(CONVEX_URL);
 
-  // Helper functions for storage
   const storage = {
     async get<T>(key: string): Promise<T | undefined> {
       const result = await browser.storage.local.get(key);
@@ -35,23 +34,31 @@ export default defineBackground(() => {
 
   type MessageType =
     | { type: "GET_AUTH_STATE" }
-    | { type: "SET_AUTH_STATE"; payload: { isAuthenticated: boolean; odch123?: string; email?: string } }
+    | {
+        type: "SET_AUTH_STATE";
+        payload: { isAuthenticated: boolean; odch123?: string; email?: string };
+      }
     | { type: "GET_CREDITS" }
     | { type: "SET_CREDITS"; payload: number }
     | { type: "DECREMENT_CREDITS" }
     | { type: "SET_PREMIUM"; payload: boolean }
     | { type: "GET_USER_STATE" }
-    | { type: "OPTIMIZE_IMAGE"; payload: { imageUrl: string; stylePreset?: string } }
+    | {
+        type: "OPTIMIZE_IMAGE";
+        payload: { imageUrl: string; stylePreset?: string };
+      }
     | { type: "CREATE_CHECKOUT" };
 
-  browser.runtime.onMessage.addListener((message: MessageType, _sender, sendResponse) => {
-    handleMessage(message, sendResponse);
-    return true;
-  });
+  browser.runtime.onMessage.addListener(
+    (message: unknown, _sender, sendResponse) => {
+      handleMessage(message as MessageType, sendResponse);
+      return true;
+    },
+  );
 
   async function handleMessage(
     message: MessageType,
-    sendResponse: (response: unknown) => void
+    sendResponse: (response: unknown) => void,
   ) {
     try {
       switch (message.type) {
@@ -67,14 +74,18 @@ export default defineBackground(() => {
           if (message.payload.odch123) {
             await storage.set("odch123", message.payload.odch123);
           }
-          if (message.payload.isAuthenticated && message.payload.odch123 && message.payload.email) {
+          if (
+            message.payload.isAuthenticated &&
+            message.payload.odch123 &&
+            message.payload.email
+          ) {
             try {
-              await convex.mutation(api.profiles.create, {
+              await convex.mutation(api.users.getOrCreateUser, {
                 odch123: message.payload.odch123,
                 email: message.payload.email,
               });
             } catch (e) {
-              console.log("[Instagram AI Optimizer] Profile may already exist");
+              console.log("[Instagram AI Optimizer] User creation error:", e);
             }
           }
           sendResponse({ success: true });
@@ -85,15 +96,21 @@ export default defineBackground(() => {
           const odch123 = await storage.get<string>("odch123");
           if (odch123 && CONVEX_URL) {
             try {
-              const profile = await convex.query(api.profiles.getByUserId, { odch123 });
-              if (profile) {
-                await storage.set("credits", profile.credits);
-                await storage.set("isPremium", profile.isPremium);
-                sendResponse({ credits: profile.isPremium ? -1 : profile.credits });
+              const user = await convex.query(api.users.getUserByOdch123, {
+                odch123,
+              });
+              if (user) {
+                const hasSubscription = user.subscriptionStatus === "active";
+                await storage.set("credits", user.credits);
+                await storage.set("isPremium", hasSubscription);
+                sendResponse({ credits: user.credits });
                 break;
               }
             } catch (e) {
-              console.error("[Instagram AI Optimizer] Failed to fetch profile:", e);
+              console.error(
+                "[Instagram AI Optimizer] Failed to fetch user:",
+                e,
+              );
             }
           }
           const credits = await storage.get<number>("credits");
@@ -108,17 +125,6 @@ export default defineBackground(() => {
         }
 
         case "DECREMENT_CREDITS": {
-          const odch123 = await storage.get<string>("odch123");
-          if (odch123 && CONVEX_URL) {
-            try {
-              const result = await convex.mutation(api.profiles.decrementCredits, { odch123 });
-              await storage.set("credits", result.credits);
-              sendResponse(result);
-              break;
-            } catch (e) {
-              console.error("[Instagram AI Optimizer] Failed to decrement credits:", e);
-            }
-          }
           const currentCredits = (await storage.get<number>("credits")) ?? 1;
           const isPremium = await storage.get<boolean>("isPremium");
           if (isPremium) {
@@ -134,17 +140,6 @@ export default defineBackground(() => {
         }
 
         case "SET_PREMIUM": {
-          const odch123 = await storage.get<string>("odch123");
-          if (odch123 && CONVEX_URL) {
-            try {
-              await convex.mutation(api.profiles.setPremium, {
-                odch123,
-                isPremium: message.payload,
-              });
-            } catch (e) {
-              console.error("[Instagram AI Optimizer] Failed to set premium:", e);
-            }
-          }
           await storage.set("isPremium", message.payload);
           if (message.payload) {
             await storage.set("credits", -1);
@@ -157,20 +152,26 @@ export default defineBackground(() => {
           const odch123 = await storage.get<string>("odch123");
           if (odch123 && CONVEX_URL) {
             try {
-              const profile = await convex.query(api.profiles.getByUserId, { odch123 });
-              if (profile) {
-                await storage.set("credits", profile.credits);
-                await storage.set("isPremium", profile.isPremium);
+              const user = await convex.query(api.users.getUserByOdch123, {
+                odch123,
+              });
+              if (user) {
+                const hasSubscription = user.subscriptionStatus === "active";
+                await storage.set("credits", user.credits);
+                await storage.set("isPremium", hasSubscription);
                 sendResponse({
                   isAuthenticated: true,
-                  isPremium: profile.isPremium,
-                  credits: profile.isPremium ? -1 : profile.credits,
+                  isPremium: hasSubscription,
+                  credits: user.credits,
                   odch123,
                 });
                 break;
               }
             } catch (e) {
-              console.error("[Instagram AI Optimizer] Failed to fetch user state:", e);
+              console.error(
+                "[Instagram AI Optimizer] Failed to fetch user state:",
+                e,
+              );
             }
           }
           const [isAuthenticated, isPremium, credits] = await Promise.all([
@@ -190,15 +191,17 @@ export default defineBackground(() => {
         case "OPTIMIZE_IMAGE": {
           if (CONVEX_URL) {
             try {
-              // Use chat enhancement with a default prompt based on style preset
               const prompt = message.payload.stylePreset
                 ? `Make this image more ${message.payload.stylePreset}`
                 : "Enhance this image professionally for Instagram";
 
-              const result = await convex.action(api.chatEnhance.enhanceWithChat, {
-                imageUrl: message.payload.imageUrl,
-                userPrompt: prompt,
-              });
+              const result = await convex.action(
+                api.chatEnhance.enhanceWithChat,
+                {
+                  imageUrl: message.payload.imageUrl,
+                  userPrompt: prompt,
+                },
+              );
               sendResponse({
                 success: result.success,
                 aiImageUrl: result.enhancedUrl || message.payload.imageUrl,
@@ -207,7 +210,10 @@ export default defineBackground(() => {
               });
               break;
             } catch (e) {
-              console.error("[Instagram AI Optimizer] AI enhancement failed:", e);
+              console.error(
+                "[Instagram AI Optimizer] AI enhancement failed:",
+                e,
+              );
               sendResponse({
                 success: false,
                 aiImageUrl: message.payload.imageUrl,
@@ -232,16 +238,22 @@ export default defineBackground(() => {
           }
           if (CONVEX_URL && STRIPE_PRICE_ID) {
             try {
-              const result = await convex.action(api.stripe.createCheckoutSession, {
-                odch123,
-                priceId: STRIPE_PRICE_ID,
-                successUrl: "https://www.instagram.com/?payment=success",
-                cancelUrl: "https://www.instagram.com/?payment=cancelled",
-              });
+              const result = await convex.action(
+                api.stripe.createCheckoutSession,
+                {
+                  odch123,
+                  priceId: STRIPE_PRICE_ID,
+                  successUrl: "https://www.instagram.com/?payment=success",
+                  cancelUrl: "https://www.instagram.com/?payment=cancelled",
+                },
+              );
               sendResponse(result);
               break;
             } catch (e) {
-              console.error("[Instagram AI Optimizer] Failed to create checkout:", e);
+              console.error(
+                "[Instagram AI Optimizer] Failed to create checkout:",
+                e,
+              );
               sendResponse({ error: String(e) });
               break;
             }
@@ -260,12 +272,17 @@ export default defineBackground(() => {
   }
 
   browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if (changeInfo.status === "complete" && tab.url?.includes("instagram.com")) {
+    if (
+      changeInfo.status === "complete" &&
+      tab.url?.includes("instagram.com")
+    ) {
       const url = new URL(tab.url);
       if (url.searchParams.get("payment") === "success") {
         storage.set("isPremium", true);
         storage.set("credits", -1);
-        browser.tabs.sendMessage(tabId, { type: "PAYMENT_SUCCESS" }).catch(() => {});
+        browser.tabs
+          .sendMessage(tabId, { type: "PAYMENT_SUCCESS" })
+          .catch(() => {});
       }
       browser.tabs.sendMessage(tabId, { type: "PAGE_LOADED" }).catch(() => {});
     }

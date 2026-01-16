@@ -13,11 +13,11 @@ import {
 } from "./ai/agents/specialists";
 import { forge } from "./ai/agents/forge";
 import { openaiForge } from "./ai/openai";
+import { geminiForge } from "./ai/gemini";
+import { claudeForge } from "./ai/claude";
 
-// Provider type for image generation
-type ImageProvider = "replicate" | "openai";
+export type ImageProvider = "openai" | "gemini" | "claude" | "replicate";
 
-// Simple structured logging for Convex
 const log = {
   info: (
     component: string,
@@ -72,7 +72,14 @@ export const enhanceWithChat = action({
   args: {
     imageUrl: v.string(),
     userPrompt: v.string(),
-    provider: v.optional(v.union(v.literal("replicate"), v.literal("openai"))),
+    provider: v.optional(
+      v.union(
+        v.literal("openai"),
+        v.literal("gemini"),
+        v.literal("claude"),
+        v.literal("replicate"),
+      ),
+    ),
   },
   handler: async (
     ctx,
@@ -88,7 +95,7 @@ export const enhanceWithChat = action({
     error?: string;
   }> => {
     const startTime = Date.now();
-    const provider: ImageProvider = args.provider || "openai"; // Default to OpenAI
+    const provider: ImageProvider = args.provider || "openai";
 
     log.info("ChatEnhance", "Starting enhancement", {
       imageUrl: args.imageUrl.slice(0, 100),
@@ -99,20 +106,30 @@ export const enhanceWithChat = action({
     const geminiApiKey = process.env.GEMINI_API_KEY;
     const replicateApiKey = process.env.REPLICATE_API_TOKEN;
     const openaiApiKey = process.env.OPENAI_API_KEY;
+    const claudeApiKey = process.env.ANTHROPIC_API_KEY;
 
     log.debug("ChatEnhance", "Checking API keys", {
       hasGeminiKey: !!geminiApiKey,
       hasReplicateKey: !!replicateApiKey,
       hasOpenAIKey: !!openaiApiKey,
+      hasClaudeKey: !!claudeApiKey,
     });
 
-    // Check required keys based on provider
     const missingKeys: string[] = [];
     if (!geminiApiKey) missingKeys.push("GEMINI_API_KEY (for analysis)");
-    if (provider === "replicate" && !replicateApiKey)
+
+    if (provider === "replicate" && !replicateApiKey) {
       missingKeys.push("REPLICATE_API_TOKEN");
-    if (provider === "openai" && !openaiApiKey)
+    }
+    if (provider === "openai" && !openaiApiKey) {
       missingKeys.push("OPENAI_API_KEY");
+    }
+    if (provider === "gemini" && !geminiApiKey) {
+      missingKeys.push("GEMINI_API_KEY");
+    }
+    if (provider === "claude" && !claudeApiKey) {
+      missingKeys.push("ANTHROPIC_API_KEY");
+    }
 
     if (missingKeys.length > 0) {
       log.error("ChatEnhance", "Missing API keys", undefined, { missingKeys });
@@ -129,13 +146,14 @@ export const enhanceWithChat = action({
       console.log(
         "═══════════════════════════════════════════════════════════",
       );
-      console.log("[ChatEnhance] STARTING 5-PARALLEL-AGENT ENHANCEMENT");
+      console.log(
+        `[ChatEnhance] STARTING ENHANCEMENT WITH ${provider.toUpperCase()}`,
+      );
       console.log(`[ChatEnhance] User prompt: "${args.userPrompt}"`);
       console.log(
         "═══════════════════════════════════════════════════════════",
       );
 
-      // Run all 5 agents in parallel
       console.log("\n[ChatEnhance] Running 5 specialist agents in parallel...");
       const [composition, lighting, color, mood, detail] = await Promise.all([
         runCompositionAgent(args.imageUrl, args.userPrompt, geminiApiKey!),
@@ -154,7 +172,6 @@ export const enhanceWithChat = action({
       console.log(`  - Mood: ${mood.confidence.toFixed(2)} confidence`);
       console.log(`  - Detail: ${detail.confidence.toFixed(2)} confidence`);
 
-      // Combine into super prompt
       console.log("\n[ChatEnhance] Combining analyses into super-prompt...");
       const superPrompt = combineAgentAnalyses(
         args.userPrompt,
@@ -168,41 +185,59 @@ export const enhanceWithChat = action({
         `[ChatEnhance] Super-prompt: ${superPrompt.slice(0, 150)}...`,
       );
 
-      // Generate enhanced image using selected provider
       console.log(
         `\n[ChatEnhance] Generating enhanced image with ${provider}...`,
       );
       let enhancedUrl: string;
 
-      if (provider === "openai") {
-        // Use OpenAI's gpt-image-1 for image generation
-        enhancedUrl = await openaiForge(openaiApiKey!, {
-          imageUrl: args.imageUrl,
-          prompt: superPrompt,
-          model: "gpt-image-1",
-          quality: "high",
-          size: "1024x1024",
-        });
-      } else {
-        // Use Replicate/Flux for image generation
-        enhancedUrl = await forge(
-          { imageUrl: args.imageUrl },
-          {
-            mainPrompt: superPrompt,
-            negativePrompt:
-              "blur, noise, artifacts, oversaturated, overexposed, underexposed, distorted, low quality",
-            styleModifiers: ["instagram-ready"],
-            contentTypeModifiers: [],
-            platformModifiers: ["feed"],
-            technicalParameters: {
-              strength: 0.4,
-              guidanceScale: 7.5,
-              steps: 30,
+      switch (provider) {
+        case "openai":
+          enhancedUrl = await openaiForge(openaiApiKey!, {
+            imageUrl: args.imageUrl,
+            prompt: superPrompt,
+            model: "gpt-image-1",
+            quality: "high",
+            size: "1024x1024",
+          });
+          break;
+
+        case "gemini":
+          enhancedUrl = await geminiForge(geminiApiKey!, {
+            imageUrl: args.imageUrl,
+            prompt: superPrompt,
+            model: "gemini-2.0-flash",
+          });
+          break;
+
+        case "claude":
+          enhancedUrl = await claudeForge(claudeApiKey!, {
+            imageUrl: args.imageUrl,
+            prompt: superPrompt,
+            model: "claude-3-5-sonnet",
+          });
+          break;
+
+        case "replicate":
+        default:
+          enhancedUrl = await forge(
+            { imageUrl: args.imageUrl },
+            {
+              mainPrompt: superPrompt,
+              negativePrompt:
+                "blur, noise, artifacts, oversaturated, overexposed, underexposed, distorted, low quality",
+              styleModifiers: ["instagram-ready"],
+              contentTypeModifiers: [],
+              platformModifiers: ["feed"],
+              technicalParameters: {
+                strength: 0.4,
+                guidanceScale: 7.5,
+                steps: 30,
+              },
+              model: "flux",
             },
-            model: "flux",
-          },
-          replicateApiKey!,
-        );
+            replicateApiKey!,
+          );
+          break;
       }
 
       const processingTimeMs = Date.now() - startTime;
@@ -258,7 +293,6 @@ export const analyzeOnly = action({
       throw new Error("Missing GEMINI_API_KEY");
     }
 
-    // Run all 5 agents in parallel
     const [composition, lighting, color, mood, detail] = await Promise.all([
       runCompositionAgent(args.imageUrl, args.userPrompt, geminiApiKey),
       runLightingAgent(args.imageUrl, args.userPrompt, geminiApiKey),
@@ -267,7 +301,6 @@ export const analyzeOnly = action({
       runDetailAgent(args.imageUrl, args.userPrompt, geminiApiKey),
     ]);
 
-    // Combine into super prompt
     const superPrompt = combineAgentAnalyses(
       args.userPrompt,
       composition,
@@ -280,6 +313,54 @@ export const analyzeOnly = action({
     return {
       superPrompt,
       agentAnalyses: [composition, lighting, color, mood, detail],
+    };
+  },
+});
+
+export const getAvailableProviders = action({
+  args: {},
+  handler: async (): Promise<{
+    providers: Array<{
+      id: ImageProvider;
+      name: string;
+      available: boolean;
+      description: string;
+    }>;
+    default: ImageProvider;
+  }> => {
+    const geminiApiKey = process.env.GEMINI_API_KEY;
+    const openaiApiKey = process.env.OPENAI_API_KEY;
+    const claudeApiKey = process.env.ANTHROPIC_API_KEY;
+    const replicateApiKey = process.env.REPLICATE_API_TOKEN;
+
+    return {
+      providers: [
+        {
+          id: "openai",
+          name: "OpenAI GPT-Image",
+          available: !!openaiApiKey,
+          description: "High quality image generation with DALL-E",
+        },
+        {
+          id: "gemini",
+          name: "Google Gemini",
+          available: !!geminiApiKey,
+          description: "Fast and efficient image analysis",
+        },
+        {
+          id: "claude",
+          name: "Anthropic Claude",
+          available: !!claudeApiKey,
+          description: "Advanced reasoning and image understanding",
+        },
+        {
+          id: "replicate",
+          name: "Replicate Flux",
+          available: !!replicateApiKey,
+          description: "Open-source image generation models",
+        },
+      ],
+      default: "openai",
     };
   },
 });
